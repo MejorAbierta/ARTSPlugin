@@ -78,8 +78,13 @@ class MejorAbiertaPlugin extends GenericPlugin
 
 
         $contextId = Application::CONTEXT_JOURNAL;
-        
-        $output = $this->getSubmissions($contextId);
+        /*
+        public const STATUS_QUEUED = 1;
+        public const STATUS_PUBLISHED = 3;
+        public const STATUS_DECLINED = 4;
+        public const STATUS_SCHEDULED = 5;
+        */
+        $output = $this->getSubmissions($contextId,[Submission::STATUS_PUBLISHED]);
 
         $templateMgr->addJavaScript(
             'browserConsolePlugin',
@@ -90,11 +95,11 @@ class MejorAbiertaPlugin extends GenericPlugin
         return false;
     }
 
-    function getSubmissions($context)  {
+    function getSubmissions($context,$status)  {
         $submissions = Repo::submission()
             ->getCollector()
             ->filterByContextIds([$context])
-            ->filterByStatus([Submission::STATUS_PUBLISHED])
+            ->filterByStatus($status)
             ->getMany();
      
 
@@ -210,8 +215,6 @@ class MejorAbiertaPlugin extends GenericPlugin
         // Obtener la lista de usuarios
         $users = $userRepo->dao->getMany($collector);
         
-
-        // Recorrer los usuarios y obtener sus correos electrónicos
         $emails = [];
         foreach ($users as $user) {
             try {
@@ -262,6 +265,27 @@ class MejorAbiertaPlugin extends GenericPlugin
 
         Repo::issue()
         ->getCollector()
-        ->filterByContextIds([$contextId]);
+        ->filterByContextIds([$contextId])
+        ->getMany();
+    }
+
+    function getAbout($context):string{
+        Application::get();
+        return strip_tags($context->getData('about', AppLocale::getLocale()));
+
+    }
+
+    function getJournalIdentity($context) : string{
+        $text = "Datos de la revista\n";
+        $text .= "Nombre: " . $context->getSetting('name', \AppLocale::getLocale()) . "\n";
+        $text .= "ISSN: " . $context->getSetting('printIssn') . "\n";
+        $text .= "ISSN electrónico: " . $context->getSetting('onlineIssn') . "\n";
+        $text .= "Entidad: " . $context->getSetting('publisherInstitution');
+
+        return $text;
+    }
+
+    function getEditiorialTeam($context) : string{
+        return strip_tags($context->getData('editorialTeam', \AppLocale::getLocale()));
     }
 }
