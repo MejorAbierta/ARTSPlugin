@@ -1,3 +1,4 @@
+
 <?php
 namespace APP\plugins\generic\mejorAbiertaPlugin;
 
