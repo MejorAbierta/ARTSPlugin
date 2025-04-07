@@ -1,6 +1,5 @@
-
 <?php
-namespace APP\plugins\generic\mejorAbiertaPlugin;
+namespace APP\plugins\generic\mejorAbierta;
 
 use PKP\plugins\GenericPlugin;
 use PKP\plugins\Hook;
@@ -12,8 +11,6 @@ use PKP\security\Role;
 use PKP\db\DAORegistry;
 
 use APP\submission\Submission;
-use PKP\user\User;
-use PKP\userGroup\UserGroup;
 
 class MejorAbiertaPlugin extends GenericPlugin
 {
@@ -50,7 +47,7 @@ class MejorAbiertaPlugin extends GenericPlugin
      */
     public function getDisplayName()
 	{
-        return 'Api plugin name';
+        return 'Api plugin name Benji';
     }
 
     /**
@@ -67,7 +64,7 @@ class MejorAbiertaPlugin extends GenericPlugin
         $templateMgr = $args[0];
         $template = $args[1];
 
-       
+
         // Verificar si es la plantilla que deseas modificar
         //if ($template !== 'frontend/pages/indexJournal.tpl') {
         //    return false;
@@ -92,7 +89,7 @@ class MejorAbiertaPlugin extends GenericPlugin
             'console.log(\''.$output  .'\');',
             array('inline' => true)
         );
-        
+
         return false;
     }
 
@@ -102,12 +99,12 @@ class MejorAbiertaPlugin extends GenericPlugin
             ->filterByContextIds([$context])
             ->filterByStatus($status)
             ->getMany();
-     
+
 
         $filteredElements = $submissions->filter(function ($element) {
             return $element->getData("dateSubmitted") >= date("",1741873765);
         });
-      
+
 
         $json = json_encode($submissions);
         //2025-02-13 00:00:00
@@ -117,13 +114,13 @@ class MejorAbiertaPlugin extends GenericPlugin
     }
 
 
-    
+
 
     function getEmails() {
-        
+
         $currentUser = Application::CONTEXT_JOURNAL;
         $contextId = Application::CONTEXT_JOURNAL;
-        
+
         $submissions = Repo::submission()
             ->getCollector()
             ->filterByContextIds([$contextId])
@@ -139,7 +136,7 @@ class MejorAbiertaPlugin extends GenericPlugin
 
         // Obtener la lista de usuarios
         $users = $userRepo->dao->getMany($collector);
-        
+
 
         // Recorrer los usuarios y obtener sus correos electrónicos
         $emails = [];
@@ -173,7 +170,7 @@ class MejorAbiertaPlugin extends GenericPlugin
         public const ROLE_ID_READER = 1048576;
         public const ROLE_ID_SUBSCRIPTION_MANAGER = 2097152;
         */
-        
+
         $submissions = Repo::submission()
             ->getCollector()
             ->filterByContextIds([$contextId])
@@ -189,9 +186,9 @@ class MejorAbiertaPlugin extends GenericPlugin
 
         // Obtener el repositorio de usuarios
         $userRepo = Repo::user();
-        
+
         $groups = DAORegistry::getDAO('SubscriptionTypeDAO');
-        
+
         $dateTo = date('Ymd', strtotime("-1 day"));
         $dateFrom = date("Ymd", strtotime("-1 year", strtotime($dateTo)));
         $output = "";
@@ -201,13 +198,13 @@ class MejorAbiertaPlugin extends GenericPlugin
             //$output = implode(',',array_keys(DAORegistry::getDAOs()));
 
             //$map = & Registry::get('daoMap', true, $this->getDAOMap()); // Ref req'd
-       
+
         } catch (\Throwable $th) {
             //throw $th;
             $output = $th->getMessage();
         }
         //return $output;
-       
+
         // Crear un collector para filtrar usuarios
         $collector = $userRepo->getCollector()
             ->includeReviewerData(true)
@@ -215,7 +212,7 @@ class MejorAbiertaPlugin extends GenericPlugin
 
         // Obtener la lista de usuarios
         $users = $userRepo->dao->getMany($collector);
-        
+
         $emails = [];
         foreach ($users as $user) {
             try {
@@ -223,7 +220,7 @@ class MejorAbiertaPlugin extends GenericPlugin
                 //$emails[] = implode(',', $user->getData("givenName"));
                 $emails[] = implode(',', $user->getData("familyName"));
                 $emails[] = implode(',', $user->getData("affiliation"));
-            
+
                 $emails[] = $user->getData("mailingAddress");
                 $emails[] = $user->reviewer_id;
                 $emails[] = $user->getData("phone");
@@ -232,7 +229,7 @@ class MejorAbiertaPlugin extends GenericPlugin
                 //throw $th;
                 $emails[] = $th->getMessage();
             }
-            
+
             //$emails[]= $user->getData("affiliation");
             //$emails[] = $user;
         }
@@ -242,7 +239,7 @@ class MejorAbiertaPlugin extends GenericPlugin
     }
 
 
-    function getReviewers($params) 
+    function getReviewers($params)
     {
         //GET REVIEWER
         return Repo::user()
@@ -269,7 +266,7 @@ class MejorAbiertaPlugin extends GenericPlugin
         ->filterByContextIds([$contextId])
         ->getMany();
     }
-
+    /*
     function getAbout($context):string{
         Application::get();
         return strip_tags($context->getData('about', AppLocale::getLocale()));
@@ -289,4 +286,5 @@ class MejorAbiertaPlugin extends GenericPlugin
     function getEditiorialTeam($context) : string{
         return strip_tags($context->getData('editorialTeam', \AppLocale::getLocale()));
     }
+    */
 }
