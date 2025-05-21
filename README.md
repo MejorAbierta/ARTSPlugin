@@ -2,11 +2,11 @@
 
 Current Objectives:
 
-- [ ] About
+- [x] About
 - [x] Authors
 - [x] Issues
 - [x] Reviewers
 - [x] Submissions
 - [x] FilterByDate
-- [ ] JournalIdentity
-- [ ] EditorialFlow
+- [x] JournalIdentity
+- [x] EditorialFlow
