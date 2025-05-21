@@ -24,12 +24,39 @@ class MejorAbiertaPlugin extends GenericPlugin
             
             Hook::add('TemplateManager::display', array($this, 'callbackTemplateDisplay'));
 
-            
-            Hook::add('APIHandler::endpoints', [$this, 'addEndpoints']);
+            //Hook::add('Dispatcher::dispatch', [$this, 'setupAPIHandler']);
+            //Hook::add('APIHandler::endpoints', [$this, 'addEndpoints']);
         }
 
         return $success;
     }
+
+
+    /*
+    public function setupAPIHandler(string $hookName, array $args): void
+    {
+        $request = $args[0];
+        $router = $request->getRouter();
+
+        if (!($router instanceof \PKP\core\APIRouter)) {
+            return;
+        }
+
+        if (str_contains($request->getRequestPath(), 'api/v1/customQuestionResponses')) {
+            $handler = new CustomQuestionResponseHandler();
+        }
+
+        if (!isset($handler)) {
+            return;
+        }
+
+        $router->setHandler($handler);
+        $handler->getApp()->run();
+        exit;
+    }
+        */
+
+
     //Not getting called in 3.4
     public function addEndpoints($hookName, $params) {
         $endpoints =& $params[0];
@@ -82,7 +109,8 @@ class MejorAbiertaPlugin extends GenericPlugin
         public const STATUS_DECLINED = 4;
         public const STATUS_SCHEDULED = 5;
         */
-        $output = $this->getSubmissions($contextId,[Submission::STATUS_PUBLISHED]);
+        $output = $this->getAbout($contextId);
+        //$output = $this->getSubmissions($contextId,[Submission::STATUS_PUBLISHED]);
 
         $templateMgr->addJavaScript(
             'browserConsolePlugin',
@@ -266,25 +294,40 @@ class MejorAbiertaPlugin extends GenericPlugin
         ->filterByContextIds([$contextId])
         ->getMany();
     }
-    /*
-    function getAbout($context):string{
-        Application::get();
-        return strip_tags($context->getData('about', AppLocale::getLocale()));
 
-    }
+     function getJournalIdentity($contextId) : string{
+        /** @var ContextDAO $contextDao */
+        $contextDao = Application::getContextDAO();
+        /** @var Context $context */
+        $context = $contextDao->getById($contextId);
 
-    function getJournalIdentity($context) : string{
-        $text = "Datos de la revista\n";
-        $text .= "Nombre: " . $context->getSetting('name', \AppLocale::getLocale()) . "\n";
-        $text .= "ISSN: " . $context->getSetting('printIssn') . "\n";
-        $text .= "ISSN electrónico: " . $context->getSetting('onlineIssn') . "\n";
+        $text = "Datos de la revista"."|";
+        $text .= "Nombre: " . implode(",",$context->getSetting('name'))."|";
+        $text .= "ISSN: " . $context->getSetting('printIssn')."|";
+        $text .= "ISSN electrónico: " . $context->getSetting('onlineIssn')."|";
         $text .= "Entidad: " . $context->getSetting('publisherInstitution');
 
         return $text;
     }
 
-    function getEditiorialTeam($context) : string{
-        return strip_tags($context->getData('editorialTeam', \AppLocale::getLocale()));
+    function getAbout($contextId):string{
+        /** @var ContextDAO $contextDao */
+        $contextDao = Application::getContextDAO();
+        /** @var Context $context */
+        $context = $contextDao->getById($contextId);
+        return implode(",",$context->getData('about'));
+
     }
-    */
+
+    
+  
+    function getEditiorialTeam($contextId) : string{
+        /** @var ContextDAO $contextDao */
+        $contextDao = Application::getContextDAO();
+        /** @var Context $context */
+        $context = $contextDao->getById($contextId);
+
+        return implode(",",$context->getData('editorialTeam'));
+    }
+    
 }
