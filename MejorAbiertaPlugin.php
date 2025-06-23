@@ -11,6 +11,10 @@ use APP\core\Application;
 
 use APP\facades\Repo;
 
+
+use PKP\core\APIResponse;
+use Slim\Http\Request as SlimRequest;
+
 class MejorAbiertaPlugin extends GenericPlugin
 {
 
@@ -26,13 +30,13 @@ class MejorAbiertaPlugin extends GenericPlugin
         if ($success && $this->getEnabled()) {
             // Add a handler to process the biography page
             Hook::add('LoadHandler', array($this, 'callbackHandleContent'));
+            Hook::add('APIHandler::endpoints', [$this, 'addEndpoints']);
         }
         return $success;
     }
 
     public function callbackHandleContent($hookName, $args)
     {
-
         $page = &$args[0];
         $op = &$args[1];
         $handler = &$args[3];
@@ -60,5 +64,29 @@ class MejorAbiertaPlugin extends GenericPlugin
     public function getDescription()
     {
         return "Mejor Abierta Api";
+    }
+
+    public function addEndpoints($hookName, $args)
+    {
+        $endpoints = &$args[0];
+        $apiHandler = $args[1];
+/*
+        array_unshift(
+            $endpoints['GET'],
+            [
+                'pattern' => '/{contextPath}/api/{version}/many',
+                'handler' => [$this, 'getMany'],
+                //'roles' => [],
+            ]
+        );*/
+
+        echo "addEndpoints</br>";
+    }
+
+    public function getMany(SlimRequest $slimRequest, APIResponse $response, array $args): APIResponse
+    {
+        $params = $slimRequest->getQueryParams();
+        echo "getMany";
+        return $response->withJson("buenas", 200);
     }
 }
