@@ -29,7 +29,14 @@ use APP\core\Application;
 
 class MejorAbiertaHandler extends APIHandler
 {
-    var $bannedFields = ['password', 'apiKey', 'email', 'familyName', 'givenName'];
+    var $bannedFields = [
+        'password',
+        'apiKey',
+        'email',
+       // 'familyName',
+       // 'givenName',
+        'accessStatus'
+    ];
 
 
     public function __construct()
@@ -44,7 +51,12 @@ class MejorAbiertaHandler extends APIHandler
             'GET' => [
                 [
                     'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'getReviewers'],
+                    'handler' => [$this, 'about'],
+                    //'roles' => $roles,
+                ],
+                [
+                    'pattern' => $this->getEndpointPattern(),
+                    'handler' => [$this, 'reviewers'],
                     //'roles' => $roles,
                 ],
                 [
@@ -94,6 +106,10 @@ class MejorAbiertaHandler extends APIHandler
                 [
                     'pattern' => $this->getEndpointPattern(),
                     'handler' => [$this, 'DAO'],
+                ],
+                [
+                    'pattern' => $this->getEndpointPattern(),
+                    'handler' => [$this, 'submissions'],
                 ],
 
                 /*  [
@@ -258,7 +274,7 @@ class MejorAbiertaHandler extends APIHandler
     }
 
 
-    public function getReviewers($args, $request)
+    public function reviewers($args, $request)
     {
 
         $data = Repo::user()
@@ -307,32 +323,73 @@ class MejorAbiertaHandler extends APIHandler
         echo json_encode($data);
     }
 
+    function about(): string
+    {
+        $contextId = Application::CONTEXT_JOURNAL;
+        /** @var ContextDAO $contextDao */
+        $contextDao = Application::getContextDAO();
+        /** @var Context $context */
+        $context = $contextDao->getById($contextId);
+        return implode(",", $context->getData('about'));
+    }
+
+
+    function submissions()
+    {
+        /*
+        public const STATUS_QUEUED = 1;
+        public const STATUS_PUBLISHED = 3;
+        public const STATUS_DECLINED = 4;
+        public const STATUS_SCHEDULED = 5;
+        */
+
+        $contextId = Application::CONTEXT_JOURNAL;
+        $submissions = Repo::submission()
+            ->getCollector()
+            ->filterByContextIds([$contextId])
+            //->filterByStatus($status)
+            ->getMany();
+
+        /*
+        $filteredElements = $submissions->filter(function ($element) {
+            return $element->getData("dateSubmitted") >= date("", 1741873765);
+        });
+        */
+
+        $json = json_encode($submissions);
+        //2025-02-13 00:00:00
+
+        //return "" . $filteredElements;
+
+        echo json_encode($this->anonimizeData($submissions));
+    }
+
     function anonimizeData($data)
     {
 
-
-        if (get_class($data) === 'Illuminate\Support\LazyCollection') {
-            return $data->map(function ($item) {
-
-                $item = (array) $item;
-                foreach ($this->bannedFields as $key => $value) {
-                    unset($item['_data'][$value]);
-                }
-
-                return (object) $item;
-            });
-        } else {
-            $collection = collect([$data]);
-
-            return $collection->map(function ($item) {
-
-                $item = (array) $item;
-                foreach ($this->bannedFields as $key => $value) {
-                    unset($item['_data'][$value]);
-                }
-
-                return (object) $item;
-            });
+        if (get_class($data) != 'Illuminate\Support\LazyCollection') {
+            $data = collect([$data]);
         }
+
+        return $data->map(function ($item) {
+
+            $item = (array) $item;
+            foreach ($this->bannedFields as $key => $value) {
+                if (!isset($item['_data'])) {
+                    break;
+                }
+                unset($item['_data'][$value]);
+
+                if (isset($item['_data']['publications'])) {
+                    $item['_data']['publications'] = $this->anonimizeData($item['_data']['publications']);
+                }
+
+                if (isset($item['_data']['authors'])) {
+                    $item['_data']['authors'] = $this->anonimizeData($item['_data']['authors']);
+                }
+            }
+
+            return (object) $item;
+        });
     }
 }
