@@ -105,7 +105,6 @@ def data_author():
             "affiliation": author.get("affiliation", {}).get("en", ""),
             "familyName": author.get("familyName", {}).get("en", ""),
             "givenName": author.get("givenName", {}).get("en", ""),
-           
         }
 
         authors.append(pub_object)
@@ -113,7 +112,7 @@ def data_author():
 
 
 # Export reviewer data
-def getReviewers():
+def get_reviewers():
     data = call_ojs_api("reviewers")
 
     reviewers = []
@@ -125,19 +124,133 @@ def getReviewers():
             "id": reviewer["id"],
             "affiliation": reviewer.get("affiliation", {}).get("en", ""),
             "familyName": reviewer.get("familyName", {}).get("en", ""),
-            "givenName": reviewer.get("givenName", {}).get("en", ""),  
+            "givenName": reviewer.get("givenName", {}).get("en", ""),
         }
         reviewers.append(pub_object)
 
     print(json.dumps(reviewers, indent=4))
 
 
-getReviewers()
-
-
 # Export issues documentation
+def get_issues():
+    data = call_ojs_api("issues")
+
+    items = []
+
+    for value in data:
+        item = value["_data"]
+
+        submissions = []
+        for submission_id, submission in item.get("submissions", {}).items():
+            publications = []
+            if "publications" in submission.get("_data", {}):
+                for publication_id, publication in submission["_data"][
+                    "publications"
+                ].items():
+                    title = publication["_data"].get("title", {}).get("en", "")
+                    authors = []
+                    if "authors" in publication["_data"]:
+                        for author_id, author in publication["_data"][
+                            "authors"
+                        ].items():
+                            authors.append(
+                                {
+                                    "id": author["_data"]["id"],
+                                    "email": author["_data"]["email"],
+                                    "familyName": author["_data"]
+                                    .get("familyName", {})
+                                    .get("en", ""),
+                                    "givenName": author["_data"]
+                                    .get("givenName", {})
+                                    .get("en", ""),
+                                }
+                            )
+
+                    publications.append(
+                        {
+                            "id": publication["_data"]["id"],
+                            "title": title,
+                            "authors": authors,
+                        }
+                    )
+
+            submissions.append(
+                {
+                    "id": submission["_data"]["id"],
+                    "publications": publications,
+                }
+            )
+
+        pub_object = {
+            "id": item["id"],
+            "volume": item.get("volume", {}),
+            "number": item.get("number", {}),
+            "year": item.get("year", {}),
+            "submissions": submissions,
+        }
+        items.append(pub_object)
+
+    print(json.dumps(items, indent=4))
+
+
 # Export journal identification data
+def get_journal_identy():
+    data = call_ojs_api("journalIdentity")
+
+    items = []
+
+    for value in data:
+        item = value["_data"]
+
+        pub_object = {
+            "name": item["name"].get("en", ""),
+            "printIssn": item.get("printIssn", {}),
+            "onlineIssn": item.get("onlineIssn", {}),
+            "publisherInstitution": item.get("publisherInstitution", {}),
+        }
+        items.append(pub_object)
+
+
+    print(json.dumps(items, indent=4))
+
+
 # Export information from the article submission page
+def get_submission_info():
+    data = call_ojs_api("journalIdentity")
+    sections = call_ojs_api("section")
+
+    itemsSections = []
+
+    for key, value in sections.items():
+        item = value["_data"]
+
+        pub_object = {
+            "title": item["title"].get("en", ""),
+            "policy": item["policy"].get("en", ""),
+        }
+        itemsSections.append(pub_object)
+
+
+    items = []
+
+    for value in data:
+        item = value["_data"]
+
+        pub_object = {
+            "name": item["name"].get("en", ""),
+            "authorGuidelines": item.get("authorGuidelines", {}),
+            "submissionChecklist": item["submissionChecklist"].get("en", ""),
+            "copyrightNotice": item.get("copyrightNotice", {}).get("en", ""),
+            "privacyStatement": item.get("privacyStatement",{}).get("en", ""),
+            "sections":itemsSections
+        }
+        items.append(pub_object)
+
+    print(json.dumps(items, indent=4))
+
+
+get_submission_info()
+
 # Export a summary of the last year and statistics on submissions and reviewers
 # Export URLs
 

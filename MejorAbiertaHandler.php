@@ -11,6 +11,8 @@ use Slim\Http\Request as SlimRequest;
 use APP\facades\Repo;
 use PKP\security\Role;
 use PKP\db\DAORegistry;
+use PKP\submission\PKPSubmission;
+
 use PKP\security\authorization\ContextAccessPolicy;
 use PKP\security\authorization\ContextRequiredPolicy;
 
@@ -33,8 +35,8 @@ class MejorAbiertaHandler extends APIHandler
         'password',
         'apiKey',
         'email',
-       // 'familyName',
-       // 'givenName',
+        // 'familyName',
+        // 'givenName',
         'accessStatus'
     ];
 
@@ -61,7 +63,7 @@ class MejorAbiertaHandler extends APIHandler
                 ],
                 [
                     'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'getJournalIdentity'],
+                    'handler' => [$this, 'journalIdentity'],
                 ],
                 [
                     'pattern' => $this->getEndpointPattern(),
@@ -110,6 +112,10 @@ class MejorAbiertaHandler extends APIHandler
                 [
                     'pattern' => $this->getEndpointPattern(),
                     'handler' => [$this, 'submissions'],
+                ],
+                [
+                    'pattern' => $this->getEndpointPattern(),
+                    'handler' => [$this, 'issues'],
                 ],
 
                 /*  [
@@ -291,7 +297,7 @@ class MejorAbiertaHandler extends APIHandler
 
 
 
-    function getJournalIdentity()
+    function journalIdentity()
     {
         $contextId = Application::CONTEXT_JOURNAL;
         /** @var ContextDAO $contextDao */
@@ -306,6 +312,9 @@ class MejorAbiertaHandler extends APIHandler
         $text .= "ISSN electrónico: " . $context->getSetting('onlineIssn') . "|";
         $text .= "Entidad: " . $context->getSetting('publisherInstitution');
         */
+        $context->printIssn = $context->getSetting('printIssn');
+        $context->onlineIssn = $context->getSetting('onlineIssn');
+        $context->publisherInstitution = $context->getSetting('publisherInstitution');
 
         echo json_encode($this->anonimizeData($context));
     }
@@ -362,6 +371,46 @@ class MejorAbiertaHandler extends APIHandler
         //return "" . $filteredElements;
 
         echo json_encode($this->anonimizeData($submissions));
+    }
+
+    function issues()
+    {
+
+        $contextId = Application::CONTEXT_JOURNAL;
+        $data = Repo::issue()
+            ->getCollector()
+            ->filterByContextIds([$contextId])
+            ->filterByPublished(true)
+            //->filterByStatus($status)
+            ->getMany();
+
+        $result = [];
+        foreach ($data as $key => $item) {
+            //echo json_encode($item->_data["id"]);
+            $item->_data["submissions"] = Repo::submission()
+                ->getCollector()
+                ->filterByContextIds([$contextId])
+                ->filterByIssueIds([$item->_data["id"]])
+                ->filterByStatus([PKPSubmission::STATUS_PUBLISHED])
+                ->orderBy('seq', 'ASC')
+                ->getMany();
+
+            $result[] = $item;
+        }
+
+        echo json_encode($result);
+        //echo json_encode($this->anonimizeData($data));
+    }
+
+    function section()
+    {
+        $contextId = Application::CONTEXT_JOURNAL;
+        $data = Repo::section()
+            ->getCollector()
+            ->filterByContextIds([$contextId])
+            ->getMany();
+
+        echo json_encode($this->anonimizeData($data));
     }
 
     function anonimizeData($data)
