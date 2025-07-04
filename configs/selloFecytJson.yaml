@@ -1,0 +1,105 @@
+# Nombre: Sello FECYT 2025
+# Descripción: JSON
+# End point:
+#   - https://test/mejorabierta/report/01/
+
+report:
+  config:
+    id: 01
+    name: Informe FECYT 2025
+    authorization: role 
+      params: Journal Manager
+    format: json
+
+  data:
+    id: 01
+      title: Nombre de la Revista
+      operation: runSQL
+        params: |
+          SELECT setting_value 
+          FROM journal_settings 
+          WHERE setting_name = 'name'
+      output:
+        group: journal
+        fields: title
+    id: 02
+      title: ISSN
+      operation: runSQL
+        params: |
+          SELECT setting_value
+          FROM journal_settings 
+          WHERE setting_name = 'onlineIssn'
+      output:
+        group: journal
+        fields: issn
+    id: 02
+      title: About the journal
+      operation: runDAO
+        params:
+          type: context
+          id: 1             # Journal Number
+          fields:
+            - about
+      output:
+        group: journal
+        fields: issn
+    id: 03
+      title: Nº artículos recibidos (en el último año)
+      operation: runSql 
+        params: |
+          SELECT COUNT(*)
+          FROM submissions
+          WHERE status = 'submited' AND
+            date_submitted >= NOW() - INTERVAL 1 YEAR;
+      output:
+        group: journal
+        fields: '#articles'
+
+    id: 04
+      title: Revisores de la revista 1 para el año 2022 y 2023.
+      description: Returns the reviewer's name, the issue and the year of the review.
+      operation: runDAO
+        params: 
+          type: registry
+          registry: user
+          filters:
+            - filterByRoleIds([Role::ROLE_ID_REVIEWER])
+            - filterByContextIds([1])
+            - filterRegisteredBefore([2023, 2024])
+          getMany: 100
+      output:
+        group: reviewers
+        fields:
+          - name
+          - issue
+          - year
+
+    id: 06
+      title: Nº de rechazos del último número
+      operation: querySql() 
+        params: |
+          SELECT COUNT(*)
+          FROM articles
+          JOIN article_statuses ON articles.article_id = article_statuses.article_id
+          JOIN issues ON articles.issue_id = issues.issue_id
+          WHERE articles.status = 'archived' AND
+            article_statuses.stage = 'editorial' AND
+            article_statuses.article_id IN (
+              SELECT article_id
+              FROM article_decisions
+              WHERE decision = 'decline'
+            ) AND
+            issues.published_date = (
+              SELECT MAX(published_date)
+              FROM issues
+              WHERE status = 'published'
+            );
+
+    id: 07
+      title: Flujo editorial (2 artículos)
+      operation: getAllWorkflow
+        params:
+          article_id: 130
+          article_id: 173
+      output:
+        group: flujo
