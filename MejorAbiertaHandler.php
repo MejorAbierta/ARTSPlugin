@@ -117,6 +117,10 @@ class MejorAbiertaHandler extends APIHandler
                     'pattern' => $this->getEndpointPattern(),
                     'handler' => [$this, 'issues'],
                 ],
+                [
+                    'pattern' => $this->getEndpointPattern(),
+                    'handler' => [$this, 'urls'],
+                ],
 
                 /*  [
                     'pattern' => $this->getEndpointPattern() . '/current',
@@ -411,6 +415,23 @@ class MejorAbiertaHandler extends APIHandler
             ->getMany();
 
         echo json_encode($this->anonimizeData($data));
+    }
+
+    function urls($args, $request)
+    {
+        $contextId = Application::CONTEXT_JOURNAL;
+
+        $router = $request->getRouter();
+        $dispatcher = $router->getDispatcher();
+        $data = [];
+        $data["home"] = $dispatcher->url($request, ROUTE_PAGE, null, 'index', null, null);
+        $data["editorialTeam"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about', 'editorialTeam');
+        $data["submissions"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about', 'submissions');
+        $data["about"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about');
+        $data["privacy"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about','privacy');
+        $data["contact"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about','contact');
+
+        echo json_encode($data);
     }
 
     function anonimizeData($data)

@@ -30,6 +30,7 @@ def call_ojs_api(method):
 
     headers = {
         "Authorization": f"Bearer {api_token}",
+        "Au": f"Bearer {api_token}",
         "Content-Type": "application/json",
     }
 
@@ -49,8 +50,7 @@ def call_ojs_api(method):
 
 # Export contents About
 def getAbout():
-    call_ojs_api("about")
-
+    data = call_ojs_api("about")
 
 # Export article documentation
 def count_articles():
@@ -190,7 +190,7 @@ def get_issues():
         }
         items.append(pub_object)
 
-    print(json.dumps(items, indent=4))
+    print(json.dumps(data, indent=4))
 
 
 # Export journal identification data
@@ -225,8 +225,8 @@ def get_submission_info():
         item = value["_data"]
 
         pub_object = {
-            "title": item["title"].get("en", ""),
-            "policy": item["policy"].get("en", ""),
+            "title": item.get("title",{}).get("en", ""),
+            "policy": item.get("policy", {}).get("en", ""),
         }
         itemsSections.append(pub_object)
 
@@ -248,13 +248,14 @@ def get_submission_info():
 
     print(json.dumps(items, indent=4))
 
-
 get_submission_info()
 
-# Export a summary of the last year and statistics on submissions and reviewers
 # Export URLs
+def get_urls():
+    data = call_ojs_api("urls")
 
-# Export all archives-documentation
+    print(json.dumps(data, indent=4))
 
-# Export editorial
+
+# Export a summary of the last year and statistics on submissions and reviewers
 # Export editorial flow of the selected submission
