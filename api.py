@@ -36,14 +36,27 @@ def call_ojs_api(method):
 
     print(f"Calling: {url}")
     response = requests.get(url, headers=headers)
-
+    content_type = response.headers.get('Content-Type')
+    
     if response.status_code == 200:
-        try:
-            data = response.json()
-            # print(json.dumps(response.json(), indent=4))
-            return data
-        except requests.exceptions.JSONDecodeError:
-            print(f"Content: {response.content}")
+        if content_type == "application/zip":
+            filename = method.replace("/","")+".zip"
+            try:
+                response = requests.get(url, stream=True)
+                response.raise_for_status()
+                with open(filename, 'wb') as file:
+                    for chunk in response.iter_content(chunk_size=1024):
+                        file.write(chunk)
+                print(f"File saved as {filename}")
+            except requests.exceptions.RequestException as e:
+                print(f"Error: {e}")    
+        else:
+            try:
+                data = response.json()
+                # print(json.dumps(response.json(), indent=4))
+                return data
+            except requests.exceptions.JSONDecodeError:
+                print(f"Content: {response.content}")
     else:
         print(f"Error {response.status_code}: {response.text}")
 
@@ -248,7 +261,6 @@ def get_submission_info():
 
     print(json.dumps(items, indent=4))
 
-get_submission_info()
 
 # Export URLs
 def get_urls():
@@ -257,5 +269,35 @@ def get_urls():
     print(json.dumps(data, indent=4))
 
 
-# Export a summary of the last year and statistics on submissions and reviewers
 # Export editorial flow of the selected submission
+def get_editorial_flow():
+    submission_id = "51"
+
+    #"informes evaluación"
+    reviews = call_ojs_api("reviews/"+submission_id)
+
+    #historic
+    eventlogsItems = []
+    data = call_ojs_api("eventlogs/"+submission_id)
+
+    for key, value in data.items():
+        item = value["_data"]
+        pub_object = {
+            "username": item["username"],
+            "dateLogged": item.get("dateLogged", {}),
+            "message": item["message"],
+            "filename": item.get("filename", {}).get("es_AR", ""),
+        }
+        eventlogsItems.append(pub_object)
+
+    print(json.dumps(eventlogsItems, indent=4))
+
+    #download all files from submission id
+    data = call_ojs_api("submissionFile/"+submission_id)
+
+    
+
+get_editorial_flow()
+
+
+# Export a summary of the last year and statistics on submissions and reviewers

@@ -121,6 +121,14 @@ class MejorAbiertaHandler extends APIHandler
                     'pattern' => $this->getEndpointPattern(),
                     'handler' => [$this, 'urls'],
                 ],
+                [
+                    'pattern' => $this->getEndpointPattern(),
+                    'handler' => [$this, 'reviews'],
+                ],
+                [
+                    'pattern' => $this->getEndpointPattern(),
+                    'handler' => [$this, 'eventlogs'],
+                ],
 
                 /*  [
                     'pattern' => $this->getEndpointPattern() . '/current',
@@ -250,16 +258,87 @@ class MejorAbiertaHandler extends APIHandler
     }
 
 
-    public function submissionFile($args, $request)
+    function submissionFile($args, $request)
     {
 
         $data = Repo::submissionFile()
-            ->getCollector()
-            ->getMany();
+            ->getCollector();
 
+        if (isset($args[0])) {
+            $data->filterBySubmissionIds([$args[0]]);
+        }
 
-        echo json_encode($data);
+        $data = $data->getMany();
+        //echo json_encode($data);
+
+        $files = [];
+        foreach ($data as $key => $value) {
+            $path = \Config::getVar('files', 'files_dir') . '/' . $value->getData('path');
+            $fileName = $value->getLocalizedData('name');
+            if (file_exists($path)) {
+
+                $files[] = [
+                    'path' => $path,
+                    'name' => $fileName,
+                ];
+            }
+        }
+
+        if (count($files) > 0) {
+            $this->compressAndDownload($files, "submissionFiles.zip");
+        }
     }
+
+    function compressAndDownload($files, $zipFileName)
+    {
+        // Create a new zip file
+        $zip = new \ZipArchive();
+        $tempZipFile = tempnam(sys_get_temp_dir(), 'zip');
+        if ($zip->open($tempZipFile, \ZipArchive::CREATE) === TRUE) {
+            // Add files to the zip
+            foreach ($files as $file) {
+                $zip->addFile($file['path'], $file['name']);
+            }
+            // Close the zip file
+            $zip->close();
+
+            // Output the zip file
+            header('Content-Type: application/zip');
+            header('Content-Disposition: attachment; filename="' . $zipFileName . '"');
+            header('Content-Length: ' . filesize($tempZipFile));
+            ob_clean();
+            flush();
+            readfile($tempZipFile);
+            unlink($tempZipFile);
+            exit;
+        } else {
+            echo "Error creating zip file.";
+        }
+    }
+
+    function downloadFile($filePath, $fileName)
+    {
+        // Check if the file exists
+        if (!file_exists($filePath)) {
+            echo "File not found.";
+            return;
+        }
+
+        // Get the file size
+        $fileSize = filesize($filePath);
+
+        // Get the file type
+        $fileType = mime_content_type($filePath);
+
+        // Set the headers
+        header('Content-Type: ' . $fileType);
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Content-Length: ' . $fileSize);
+
+        // Read the file and output it
+        readfile($filePath);
+    }
+
 
     public function userGroup($args, $request)
     {
@@ -419,8 +498,6 @@ class MejorAbiertaHandler extends APIHandler
 
     function urls($args, $request)
     {
-        $contextId = Application::CONTEXT_JOURNAL;
-
         $router = $request->getRouter();
         $dispatcher = $router->getDispatcher();
         $data = [];
@@ -428,11 +505,34 @@ class MejorAbiertaHandler extends APIHandler
         $data["editorialTeam"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about', 'editorialTeam');
         $data["submissions"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about', 'submissions');
         $data["about"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about');
-        $data["privacy"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about','privacy');
-        $data["contact"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about','contact');
+        $data["privacy"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about', 'privacy');
+        $data["contact"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about', 'contact');
 
         echo json_encode($data);
     }
+
+    function reviews($args)
+    {
+        //this seems to return empty...?
+        $submissionId = $args[0];
+
+        $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
+        $reviewAssignments = $reviewAssignmentDao->getBySubmissionId($submissionId);
+
+        echo json_encode($reviewAssignments);
+    }
+
+    function eventlogs($args)
+    {
+        $submissionId = $args[0];
+
+        $eventLogs = Repo::eventLog()
+            ->getCollector()
+            ->filterByAssoc(Application::ASSOC_TYPE_SUBMISSION, [$submissionId])
+            ->getMany();
+        echo json_encode($eventLogs);
+    }
+
 
     function anonimizeData($data)
     {
