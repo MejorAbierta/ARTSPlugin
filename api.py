@@ -101,7 +101,8 @@ def count_articles():
                 status_count[status_name] = 1
 
             publications.append(pub_object)
-    print(json.dumps(status_count, indent=4))
+    
+    return status_count
 
 
 # Export author data
@@ -129,6 +130,9 @@ def get_reviewers():
     data = call_ojs_api("reviewers")
 
     reviewers = []
+    
+    if data == []:
+        return ""
 
     for key, value in data.items():
         reviewer = value["_data"]
@@ -141,7 +145,7 @@ def get_reviewers():
         }
         reviewers.append(pub_object)
 
-    print(json.dumps(reviewers, indent=4))
+    print(json.dumps(data, indent=4))
 
 
 # Export issues documentation
@@ -207,7 +211,7 @@ def get_issues():
 
 
 # Export journal identification data
-def get_journal_identy():
+def get_journal_identity():
     data = call_ojs_api("journalIdentity")
 
     items = []
@@ -223,8 +227,8 @@ def get_journal_identy():
         }
         items.append(pub_object)
 
-
-    print(json.dumps(items, indent=4))
+    return items
+    #print(json.dumps(items, indent=4))
 
 
 # Export information from the article submission page
@@ -270,8 +274,7 @@ def get_urls():
 
 
 # Export editorial flow of the selected submission
-def get_editorial_flow():
-    submission_id = "51"
+def get_editorial_flow(submission_id):
 
     #"informes evaluación"
     reviews = call_ojs_api("reviews/"+submission_id)
@@ -297,7 +300,19 @@ def get_editorial_flow():
 
     
 
-get_editorial_flow()
+#get_editorial_flow("51")
 
 
 # Export a summary of the last year and statistics on submissions and reviewers
+def get_summary_statistics():
+
+    status_count = count_articles()
+   
+    rejection_rate = round((status_count.get("STATUS_DECLINED",0) /  status_count.get("STATUS_PUBLISHED",0)) * 100, 1) if  status_count.get("STATUS_PUBLISHED",0) else 0
+
+    journal = get_journal_identity()[0].get("name","")
+
+    print(journal)
+
+    reviewers = get_reviewers()
+#get_summary_statistics()
