@@ -1,5 +1,6 @@
 import requests
 import json
+import csv
 import os
 
 
@@ -62,8 +63,9 @@ def call_ojs_api(method):
 
 
 # Export contents About
-def getAbout():
+def get_about():
     data = call_ojs_api("about")
+    return data
 
 # Export article documentation
 def count_articles():
@@ -122,7 +124,7 @@ def data_author():
         }
 
         authors.append(pub_object)
-    print(json.dumps(authors, indent=4))
+    return authors
 
 
 # Export reviewer data
@@ -145,7 +147,7 @@ def get_reviewers():
         }
         reviewers.append(pub_object)
 
-    print(json.dumps(data, indent=4))
+    return data
 
 
 # Export issues documentation
@@ -207,7 +209,7 @@ def get_issues():
         }
         items.append(pub_object)
 
-    print(json.dumps(data, indent=4))
+    return data
 
 
 # Export journal identification data
@@ -263,15 +265,14 @@ def get_submission_info():
         }
         items.append(pub_object)
 
-    print(json.dumps(items, indent=4))
+    return items
 
 
 # Export URLs
 def get_urls():
     data = call_ojs_api("urls")
 
-    print(json.dumps(data, indent=4))
-
+    return data
 
 # Export editorial flow of the selected submission
 def get_editorial_flow(submission_id):
@@ -293,11 +294,13 @@ def get_editorial_flow(submission_id):
         }
         eventlogsItems.append(pub_object)
 
-    print(json.dumps(eventlogsItems, indent=4))
+    selection = input("Download all files of submission "+submission_id+"? Y/n")
+    if selection == "" or selection == "Y" or selection == "y":
+        #download all files from submission id
+        data = call_ojs_api("submissionFile/"+submission_id)
 
-    #download all files from submission id
-    data = call_ojs_api("submissionFile/"+submission_id)
-
+    return eventlogsItems
+   
     
 
 #get_editorial_flow("51")
@@ -312,7 +315,97 @@ def get_summary_statistics():
 
     journal = get_journal_identity()[0].get("name","")
 
-    print(journal)
-
     reviewers = get_reviewers()
-#get_summary_statistics()
+
+#--------------------------------------------------------
+#--------------------------------------------------------
+#--------------------------------------------------------
+
+def generate_csv(data):
+    with open('output.csv', 'w', newline='') as csvfile:
+        fieldnames = data[0].keys()
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(data)
+    print("Generated CSV")
+
+def display_menu():
+    print("\nPlease select an option (1-9):")
+    print("0. Exit")
+    print("1. Export contents About")
+    print("2. Export article documentation")
+    print("3. Export author data")
+    print("4. Export reviewer data")
+    print("5. Export issues documentation")
+    print("6. Export journal identification data")
+    print("7. Export information from the article submission page")
+    print("8. Export URLs")
+    print("9. Export editorial flow of the selected submission")
+    print("10. Export a summary of the last year and statistics on submissions and reviewers")
+
+def display_print_or_csv():
+    print("\nPlease select an option (1-2):")
+    print("1. Print")
+    print("2. Generate CSV")
+
+def handle_selection(choice):
+    if choice == '0':
+        print("Exiting program...")
+        return False
+    elif choice in ['1', '2', '3', '4', '5', '6', '7', '8', '9','10']:
+        print(f"You selected Option {choice}")
+        data = None
+        if   choice == '1':
+            data = get_about()
+        elif choice == '2':
+            data = count_articles()
+        elif choice == '3':
+            data = data_author()
+        elif choice == '4':
+            data = get_reviewers()
+        elif choice == '5':
+            data = get_issues()
+        elif choice == '6':
+            data = get_journal_identity()
+        elif choice == '7':
+            data = get_submission_info()
+        elif choice == '8':
+            data = get_urls()
+        elif choice == '9':
+            data = get_editorial_flow()
+        elif choice == '10':
+            data = get_summary_statistics()
+
+
+        if data != None:
+            display_print_or_csv()
+            selection = input("Enter your choice: ")
+            if choice == '0':
+                print("Exiting program...")
+                return False
+            elif selection in ['1', '2']:
+                if selection == '1':
+                    print(json.dumps(data, indent=4))
+                elif selection == '2':
+                    generate_csv(data)
+                return True
+            else:
+                print("Invalid selection. Please try again.")
+        else:
+            print("No data")
+        return True
+    else:
+        print("Invalid selection. Please try again.")
+        return True
+
+def main():
+    print("Welcome to the CLI FECYT!")
+    
+    running = True
+    while running:
+        display_menu()
+        selection = input("Enter your choice: ")
+        running = handle_selection(selection)
+
+
+main()
