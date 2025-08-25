@@ -1,0 +1,9 @@
+{
+    "platform": {
+        "php": "8.0.30"
+    },
+
+    "require": {
+        "symfony/yaml": "^4"
+    }
+}

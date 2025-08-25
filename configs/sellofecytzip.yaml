@@ -1,14 +1,18 @@
 # Nombre: Sello FECYT 2025
-# Descripción: JSON
-# End point:
-#   - https://test/mejorabierta/report/01/
+# Descripción: Lorem ipsum
+# Ejemplos de endpoints:
+#   - https://test/mejorabierta/report/01/ <-------- zip
+#   - https://test/mejorabierta/report/01/journual.csv
+#   - https://test/mejorabierta/report/01/reviewers.csv
+#   - https://test/mejorabierta/report/01/flujo.zip
 
 report:
   config:
     id: 01
     name: Informe FECYT 2025
-    authorization: role 
-    format: json
+    authorization: token | role | user
+      params: benji
+    format: zip | data
 
   data:
     id: 01
@@ -19,18 +23,20 @@ report:
           FROM journal_settings 
           WHERE setting_name = 'name'
       output:
-        group: journal
+        format: csv
+        file: journal.csv
         fields: title
     id: 02
       title: ISSN
       operation: runSQL
         params: |
-          SELECT setting_value
+          SELECT setting_value 
           FROM journal_settings 
           WHERE setting_name = 'onlineIssn'
       output:
-        group: journal
-        fields: issn
+        format: csv
+        file: journal.csv
+        header: issn
     id: 02
       title: About the journal
       operation: runDAO
@@ -40,8 +46,9 @@ report:
           fields:
             - about
       output:
-        group: journal
-        fields: issn
+        format: csv
+        file: journal.csv
+        header: issn
     id: 03
       title: Nº artículos recibidos (en el último año)
       operation: runSql 
@@ -51,7 +58,8 @@ report:
           WHERE status = 'submited' AND
             date_submitted >= NOW() - INTERVAL 1 YEAR;
       output:
-        group: journal
+        format: csv
+        file: journal.csv
         fields: '#articles'
 
     id: 04
@@ -67,7 +75,8 @@ report:
             - filterRegisteredBefore([2023, 2024])
           getMany: 100
       output:
-        group: reviewers
+        format: csv
+        file: reviewers.csv
         fields:
           - name
           - issue
@@ -75,9 +84,9 @@ report:
 
     id: 06
       title: Nº de rechazos del último número
-      operation: querySql() 
+      operation: runSQL
         params: |
-          SELECT COUNT(*)
+          SELECT COUNT(*) as rejections
           FROM articles
           JOIN article_statuses ON articles.article_id = article_statuses.article_id
           JOIN issues ON articles.issue_id = issues.issue_id
@@ -93,6 +102,10 @@ report:
               FROM issues
               WHERE status = 'published'
             );
+      output:
+        format: json
+        fields:
+          - rejections
 
     id: 07
       title: Flujo editorial (2 artículos)
@@ -101,4 +114,5 @@ report:
           article_id: 130
           article_id: 173
       output:
-        group: flujo
+        format: zip
+        file: flujo.zip

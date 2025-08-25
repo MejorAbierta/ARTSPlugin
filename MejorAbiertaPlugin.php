@@ -15,6 +15,8 @@ use APP\facades\Repo;
 use PKP\core\APIResponse;
 use Slim\Http\Request as SlimRequest;
 
+require_once(dirname(__FILE__) . '/vendor/autoload.php');
+
 class MejorAbiertaPlugin extends GenericPlugin
 {
 

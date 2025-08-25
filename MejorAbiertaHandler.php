@@ -12,7 +12,6 @@ use APP\facades\Repo;
 use PKP\security\Role;
 use PKP\db\DAORegistry;
 use PKP\submission\PKPSubmission;
-
 use PKP\security\authorization\ContextAccessPolicy;
 use PKP\security\authorization\ContextRequiredPolicy;
 
@@ -25,7 +24,7 @@ use APP\security\authorization\OjsJournalMustPublishPolicy;
 
 use PKP\security\authorization\PKPSiteAccessPolicy;
 
-
+use Symfony\Component\Yaml\Yaml;
 use APP\core\Application;
 
 
@@ -129,6 +128,10 @@ class MejorAbiertaHandler extends APIHandler
                     'pattern' => $this->getEndpointPattern(),
                     'handler' => [$this, 'eventlogs'],
                 ],
+                [
+                    'pattern' => $this->getEndpointPattern(),
+                    'handler' => [$this, 'parseyaml'],
+                ],
 
                 /*  [
                     'pattern' => $this->getEndpointPattern() . '/current',
@@ -210,7 +213,11 @@ class MejorAbiertaHandler extends APIHandler
             ->getMany();
 
 
-        echo json_encode($data);
+        if ($request != null) {
+            echo json_encode($data);
+        } else {
+            return $data;
+        }
     }
 
     public function author($args, $request)
@@ -221,7 +228,11 @@ class MejorAbiertaHandler extends APIHandler
             ->getMany();
 
 
-        echo json_encode($this->anonimizeData($data));
+        if ($request != null) {
+            echo json_encode($data);
+        } else {
+            return $data;
+        }
     }
 
     public function category($args, $request)
@@ -232,7 +243,11 @@ class MejorAbiertaHandler extends APIHandler
             ->getMany();
 
 
-        echo json_encode($data);
+        if ($request != null) {
+            echo json_encode($data);
+        } else {
+            return $data;
+        }
     }
 
     public function decision($args, $request)
@@ -243,7 +258,11 @@ class MejorAbiertaHandler extends APIHandler
             ->getMany();
 
 
-        echo json_encode($data);
+        if ($request != null) {
+            echo json_encode($data);
+        } else {
+            return $data;
+        }
     }
 
     public function institution($args, $request)
@@ -254,7 +273,11 @@ class MejorAbiertaHandler extends APIHandler
             ->getMany();
 
 
-        echo json_encode($data);
+        if ($request != null) {
+            echo json_encode($data);
+        } else {
+            return $data;
+        }
     }
 
 
@@ -340,16 +363,7 @@ class MejorAbiertaHandler extends APIHandler
     }
 
 
-    public function userGroup($args, $request)
-    {
 
-        $data = Repo::userGroup()
-            ->getCollector()
-            ->getMany();
-
-
-        echo json_encode($data);
-    }
 
     function representation()
     {
@@ -368,12 +382,20 @@ class MejorAbiertaHandler extends APIHandler
 
         $data = Repo::user()
             ->getCollector()
-            ->filterByRoleIds([Role::ROLE_ID_REVIEWER])
-            ->getMany();
+            ->filterByRoleIds([Role::ROLE_ID_REVIEWER]);
+
+        if (isset($args[0])) {
+            $data->filterByUserIds([$args[0]]);
+        }
+
+        $data = $data->getMany();
 
 
-
-        echo json_encode($this->anonimizeData($data));
+        if ($request != null) {
+            echo json_encode($data);
+        } else {
+            return $data;
+        }
     }
 
 
@@ -402,20 +424,23 @@ class MejorAbiertaHandler extends APIHandler
         echo json_encode($this->anonimizeData($context));
     }
 
-    function DAOs()
-    {
-        $data = DAORegistry::getDAOs();
 
-        echo json_encode($data);
+    function DAO($args, $request)
+    {
+        if (isset($args[0])) {
+            $data = DAORegistry::getDAO($args[0]);
+        } else {
+            $data = DAORegistry::getDAOs();
+        }
+
+        if ($request != null) {
+            echo json_encode($data);
+        } else {
+            return $data;
+        }
     }
 
-    function DAO($args)
-    {
-        $data = DAORegistry::getDAO($args[0]);
-        echo json_encode($data);
-    }
-
-    function about(): string
+    function about($args, $request): string
     {
         $contextId = Application::CONTEXT_JOURNAL;
         /** @var ContextDAO $contextDao */
@@ -426,7 +451,7 @@ class MejorAbiertaHandler extends APIHandler
     }
 
 
-    function submissions()
+    function submissions($args, $request)
     {
         /*
         public const STATUS_QUEUED = 1;
@@ -436,36 +461,42 @@ class MejorAbiertaHandler extends APIHandler
         */
 
         $contextId = Application::CONTEXT_JOURNAL;
-        $submissions = Repo::submission()
+        $data = Repo::submission()
             ->getCollector()
-            ->filterByContextIds([$contextId])
-            //->filterByStatus($status)
-            ->getMany();
+            ->filterByContextIds([$contextId]);
+        //->filterByStatus($status)
 
+        if (isset($args[0])) {
+            $data->filterByIssueIds([$args[0]]);
+        }
+        $data = $data->getMany();
         /*
         $filteredElements = $submissions->filter(function ($element) {
             return $element->getData("dateSubmitted") >= date("", 1741873765);
         });
         */
 
-        $json = json_encode($submissions);
-        //2025-02-13 00:00:00
-
-        //return "" . $filteredElements;
-
-        echo json_encode($this->anonimizeData($submissions));
+        if ($request != null) {
+            echo json_encode($data);
+        } else {
+            return $data;
+        }
     }
 
-    function issues()
+    function issues($args, $request)
     {
 
         $contextId = Application::CONTEXT_JOURNAL;
         $data = Repo::issue()
             ->getCollector()
             ->filterByContextIds([$contextId])
-            ->filterByPublished(true)
-            //->filterByStatus($status)
-            ->getMany();
+            ->filterByPublished(true);
+        //->filterByStatus($status)
+
+        if (isset($args[0])) {
+            $data->filterByIssueIds([$args[0]]);
+        }
+        $data = $data->getMany();
 
         $result = [];
         foreach ($data as $key => $item) {
@@ -481,11 +512,15 @@ class MejorAbiertaHandler extends APIHandler
             $result[] = $item;
         }
 
-        echo json_encode($result);
+        if ($request != null) {
+            echo json_encode($data);
+        } else {
+            return $data;
+        }
         //echo json_encode($this->anonimizeData($data));
     }
 
-    function section()
+    function section($args, $request)
     {
         $contextId = Application::CONTEXT_JOURNAL;
         $data = Repo::section()
@@ -493,7 +528,11 @@ class MejorAbiertaHandler extends APIHandler
             ->filterByContextIds([$contextId])
             ->getMany();
 
-        echo json_encode($this->anonimizeData($data));
+        if ($request != null) {
+            echo json_encode($data);
+        } else {
+            return $data;
+        }
     }
 
     function urls($args, $request)
@@ -508,29 +547,47 @@ class MejorAbiertaHandler extends APIHandler
         $data["privacy"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about', 'privacy');
         $data["contact"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about', 'contact');
 
-        echo json_encode($data);
+        if ($request != null) {
+            echo json_encode($data);
+        } else {
+            return $data;
+        }
     }
 
-    function reviews($args)
+    function reviews($args, $request)
     {
         //this seems to return empty...?
         $submissionId = $args[0];
 
         $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
-        $reviewAssignments = $reviewAssignmentDao->getBySubmissionId($submissionId);
+        $data = $reviewAssignmentDao->getBySubmissionId($submissionId);
 
-        echo json_encode($reviewAssignments);
+        if ($request != null) {
+            echo json_encode($data);
+        } else {
+            return $data;
+        }
     }
 
-    function eventlogs($args)
+    function eventlogs($args, $request)
     {
+        if (!isset($args[0])) {
+            error_log("submission id expected");
+            return;
+        }
+
         $submissionId = $args[0];
 
-        $eventLogs = Repo::eventLog()
+        $data = Repo::eventLog()
             ->getCollector()
             ->filterByAssoc(Application::ASSOC_TYPE_SUBMISSION, [$submissionId])
             ->getMany();
-        echo json_encode($eventLogs);
+
+        if ($request != null) {
+            echo json_encode($data);
+        } else {
+            return $data;
+        }
     }
 
 
@@ -561,5 +618,48 @@ class MejorAbiertaHandler extends APIHandler
 
             return (object) $item;
         });
+    }
+
+    function parseyaml($args)
+    {
+        if (sizeof($args) <= 0) {
+            return;
+        }
+        $filePath = dirname(__FILE__, 1) . '/configs/' . $args[0] . '.yaml';
+
+
+
+        $yaml = Yaml::parseFile($filePath);
+
+        //print_r($yaml);
+        echo "ID de la configuración: " . $yaml['report']['config']['id'] . "\n";
+        echo "Nombre de la configuración: " . $yaml['report']['config']['name']     . "\n";
+
+        foreach ($yaml['report']['data'] as $data) {
+            echo "title: " . $data['title'] . "\n";
+            echo "operation: " . $data['operation'] . "\n";
+            echo "params: " . $data['params'] . "\n";
+            $output = call_user_func([$this, $data['operation']], $data['params'], "");
+            echo $data['output']['fields'];
+            echo $output;
+        }
+    }
+
+    function userGroup($args, $request)
+    {
+        $data = Repo::userGroup()
+            ->getCollector();
+
+        if (isset($args[0])) {
+            $data->filterByUserGroupIds([$args[0]]);
+        }
+
+        $data = $data->getMany();
+
+        if ($request != null) {
+            echo json_encode($data);
+        } else {
+            return $data;
+        }
     }
 }
