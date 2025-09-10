@@ -39,123 +39,65 @@ class MejorAbiertaHandler extends APIHandler
         'accessStatus'
     ];
 
+    private $plugin;
 
-    public function __construct()
+
+    public function __construct($plugin)
     {
+
+        $this->plugin = $plugin;
 
         //PKPSiteAccessPolicy::SITE_ACCESS_ALL_ROLES
         $this->_handlerPath = 'mejorAbierta';
 
-        //COOKIE auth
-        $roles = [Role::ROLE_ID_AUTHOR];
-        $this->_endpoints = [
-            'GET' => [
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'about'],
-                    //'roles' => $roles,
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'reviewers'],
-                    //'roles' => $roles,
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'journalIdentity'],
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'announcement'],
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'author'],
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'category'],
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'citation'],
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'decision'],
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'institution'],
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'submissionFile'],
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'userGroup'],
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'representation'],
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'DAOs'],
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'DAO'],
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'submissions'],
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'issues'],
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'urls'],
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'reviews'],
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'eventlogs'],
-                ],
-                [
-                    'pattern' => $this->getEndpointPattern(),
-                    'handler' => [$this, 'parseyaml'],
-                ],
+        $headers = getallheaders();
+        if (!isset($headers['Authorization'])) {
 
-                /*  [
-                    'pattern' => $this->getEndpointPattern() . '/current',
-                    'handler' => [$this, 'getCurrent'],
-                    'roles' => $roles
+            $this->addRoleAssignment(
+                [
+                    Role::ROLE_ID_MANAGER,
+                    Role::ROLE_ID_SITE_ADMIN,
                 ],
                 [
-                    'pattern' => $this->getEndpointPattern() . '/{issueId:\d+}',
-                    'handler' => [$this, 'get'],
-                    'roles' => $roles
-                ],*/
-            ]
-        ];
+                    'author',
+                    'about',
+                    'reviewers',
+                    'journalIdentity',
+                    'announcement',
+                    'category',
+                    'citation',
+                    'decision',
+                    'institution',
+                    'submissionFile',
+                    //'userGroup',
+                    'representation',
+                    'submissions',
+                    'issues',
+                    'urls',
+                    'reviews',
+                    'eventlogs',
+                    'parseyaml',
+                    'report',
+                    'DAO',
+                    'user'
+                ]
+            );
+        }
     }
     public function authorize($request, &$args, $roleAssignments)
     {
         $headers = getallheaders();
-        $token = $headers['Authorization'];
         $this->read_env_file();
         $api_token = getenv('API_TOKEN');
 
-        if ($token != "Bearer $api_token") {
-            return $request->getDispatcher()->handle404();
+        if (isset($headers['Authorization'])) {
+            if ($headers['Authorization'] != "Bearer $api_token") {
+                return $request->getDispatcher()->handle404();
+            }
+        } else {
+            $this->addPolicy(new ContextAccessPolicy($request, $roleAssignments));
         }
+
         return parent::authorize($request, $args, $roleAssignments);
     }
 
@@ -214,6 +156,7 @@ class MejorAbiertaHandler extends APIHandler
 
 
         if ($request != null) {
+            header('content-type: text/json');
             echo json_encode($data);
         } else {
             return $data;
@@ -229,21 +172,23 @@ class MejorAbiertaHandler extends APIHandler
 
 
         if ($request != null) {
+            header('content-type: text/json');
             echo json_encode($data);
         } else {
             return $data;
         }
     }
 
-    public function category($args, $request)
-    {
 
-        $data = Repo::category()
+    public function user($args, $request)
+    {
+        $data = Repo::user()
             ->getCollector()
             ->getMany();
 
 
         if ($request != null) {
+            header('content-type: text/json');
             echo json_encode($data);
         } else {
             return $data;
@@ -259,6 +204,7 @@ class MejorAbiertaHandler extends APIHandler
 
 
         if ($request != null) {
+            header('content-type: text/json');
             echo json_encode($data);
         } else {
             return $data;
@@ -268,12 +214,15 @@ class MejorAbiertaHandler extends APIHandler
     public function institution($args, $request)
     {
 
+        $contextId = Application::CONTEXT_JOURNAL;
         $data = Repo::institution()
             ->getCollector()
+            ->filterByContextIds([$contextId])
             ->getMany();
 
 
         if ($request != null) {
+            header('content-type: text/json');
             echo json_encode($data);
         } else {
             return $data;
@@ -384,6 +333,8 @@ class MejorAbiertaHandler extends APIHandler
             ->getCollector()
             ->filterByRoleIds([Role::ROLE_ID_REVIEWER]);
 
+
+
         if (isset($args[0])) {
             $data->filterByUserIds([$args[0]]);
         }
@@ -392,12 +343,23 @@ class MejorAbiertaHandler extends APIHandler
 
 
         if ($request != null) {
-            echo json_encode($data);
+            header('content-type: text/json');
+            return json_encode($data);
         } else {
             return $data;
         }
     }
 
+    function filter($s, $symbol)
+    {
+        $parts = explode($symbol, $s);
+        if (count($parts) > 1) {
+            echo 'The string contains a comma.';
+        } else {
+            echo 'The string does not contain a comma.';
+            $parts = explode('=', $args);
+        }
+    }
 
 
 
@@ -434,6 +396,7 @@ class MejorAbiertaHandler extends APIHandler
         }
 
         if ($request != null) {
+            header('content-type: text/json');
             echo json_encode($data);
         } else {
             return $data;
@@ -477,6 +440,7 @@ class MejorAbiertaHandler extends APIHandler
         */
 
         if ($request != null) {
+            header('content-type: text/json');
             echo json_encode($data);
         } else {
             return $data;
@@ -489,15 +453,42 @@ class MejorAbiertaHandler extends APIHandler
         $contextId = Application::CONTEXT_JOURNAL;
         $data = Repo::issue()
             ->getCollector()
-            ->filterByContextIds([$contextId])
-            ->filterByPublished(true);
-        //->filterByStatus($status)
+            ->filterByContextIds([$contextId]);
+        //  ->filterByPublished(true);
+        //  ->filterByStatus($status)
 
-        if (isset($args[0])) {
+        //is string when recived from yaml
+        if (is_string($args)) {
+            echo "params --->" . $args;
+            $parts = explode(';', $args);
+            if (count($parts) > 1) {
+                echo 'The string contains a comma.';
+            } else {
+                echo 'The string does not contain a comma.';
+                $parts = explode('=', $args);
+                if (count($parts) > 1) {
+                    $fun = $parts[0];
+                    $param = $parts[1];
+                    $paramparts = explode(',', $param);
+
+                    if ($fun == "year") {
+                        # code...
+                        if (count($parts) > 1) {
+                            $data->filterByYears([$param]);
+                        } else {
+                            $data->filterByYears($paramparts);
+                        }
+                    }
+                } else {
+                    $parts = explode('>', $args);
+                }
+            }
+        } else if (isset($args[0])) {
             $data->filterByIssueIds([$args[0]]);
         }
         $data = $data->getMany();
 
+        
         $result = [];
         foreach ($data as $key => $item) {
             //echo json_encode($item->_data["id"]);
@@ -513,6 +504,7 @@ class MejorAbiertaHandler extends APIHandler
         }
 
         if ($request != null) {
+            header('content-type: text/json');
             echo json_encode($data);
         } else {
             return $data;
@@ -529,6 +521,7 @@ class MejorAbiertaHandler extends APIHandler
             ->getMany();
 
         if ($request != null) {
+            header('content-type: text/json');
             echo json_encode($data);
         } else {
             return $data;
@@ -548,6 +541,7 @@ class MejorAbiertaHandler extends APIHandler
         $data["contact"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about', 'contact');
 
         if ($request != null) {
+            header('content-type: text/json');
             echo json_encode($data);
         } else {
             return $data;
@@ -563,6 +557,7 @@ class MejorAbiertaHandler extends APIHandler
         $data = $reviewAssignmentDao->getBySubmissionId($submissionId);
 
         if ($request != null) {
+            header('content-type: text/json');
             echo json_encode($data);
         } else {
             return $data;
@@ -584,6 +579,7 @@ class MejorAbiertaHandler extends APIHandler
             ->getMany();
 
         if ($request != null) {
+            header('content-type: text/json');
             echo json_encode($data);
         } else {
             return $data;
@@ -636,9 +632,9 @@ class MejorAbiertaHandler extends APIHandler
         echo "Nombre de la configuración: " . $yaml['report']['config']['name']     . "\n";
 
         foreach ($yaml['report']['data'] as $data) {
-            echo "title: " . $data['title'] . "\n";
-            echo "operation: " . $data['operation'] . "\n";
-            echo "params: " . $data['params'] . "\n";
+            echo "description: " . $data['title'] . "</br>";
+            echo "operation: " . $data['operation'] . "</br>";
+            echo "params: " . $data['params'] . "</br>";
             $output = call_user_func([$this, $data['operation']], $data['params'], "");
             echo $data['output']['fields'];
             echo $output;
@@ -657,9 +653,37 @@ class MejorAbiertaHandler extends APIHandler
         $data = $data->getMany();
 
         if ($request != null) {
+            header('content-type: text/json');
             echo json_encode($data);
         } else {
             return $data;
+        }
+    }
+
+    function report($args, $request)
+    {
+
+        $form = new MejorAbiertaReportForm($this->plugin);
+        $form->initData();
+        if ($request->isPost($request)) {
+            $reportParams = $request->getUserVars();
+
+            $filePath = dirname(__FILE__, 1) . '/configs/' . $reportParams['titlefile'] . '.yaml';
+
+            $content = $reportParams['textyaml'];
+
+            if ($fp = fopen($filePath, 'w')) {
+                fwrite($fp, $content);
+                fclose($fp);
+                echo "File created successfully.";
+            } else {
+                error_log("Error creating file.");
+            }
+
+        } else {
+            $dateStart = date('Y-01-01');
+            $dateEnd = date('Y-m-d');
+            $form->display($request, 'form.tpl', [$dateStart, $dateEnd]);
         }
     }
 }

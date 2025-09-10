@@ -45,7 +45,7 @@ class ReportForm extends Form
         $this->finalDecisionDateInterval = null;
         $this->includeViews = false;
 
-        parent::__construct($plugin->getTemplateResource('example.tpl'));
+        parent::__construct($plugin->getTemplateResource('form.tpl'));
         $this->addCheck(new FormValidatorPost($this));
         $this->addCheck(new FormValidatorCSRF($this));
     }

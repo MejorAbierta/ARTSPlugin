@@ -16,3 +16,33 @@ msgstr "Plugin API mejorAbierta"
 
 msgid "plugins.generic.mejorAbierta.description"
 msgstr "mejorAbierta API ."
+
+msgid "plugins.generic.mejorAbierta.title"
+msgstr "Title"
+
+msgid "plugins.generic.mejorAbierta.operation"
+msgstr "Operation"
+
+msgid "plugins.generic.mejorAbierta.add"
+msgstr "Add data"
+
+msgid "plugins.generic.mejorAbierta.params"
+msgstr "Params"
+
+msgid "plugins.generic.mejorAbierta.filter"
+msgstr "Filter"
+
+msgid "plugins.generic.mejorAbierta.fields"
+msgstr "fields"
+
+msgid "plugins.generic.mejorAbierta.description"
+msgstr "Description"
+
+msgid "plugins.generic.mejorAbierta.format"
+msgstr "format"
+
+msgid "plugins.generic.mejorAbierta.auth"
+msgstr "Authorization"
+
+msgid "plugins.generic.mejorAbierta.accept"
+msgstr "Accept"
