@@ -151,9 +151,13 @@ class MejorAbiertaHandler extends APIHandler
     {
 
         $data = Repo::announcement()
-            ->getCollector()
-            ->getMany();
+            ->getCollector();
 
+        if (is_string($args)) {
+            $this->initFilter($args, $data);
+        }
+
+        $data = $data->getMany();
 
         if ($request != null) {
             header('content-type: text/json');
@@ -167,9 +171,13 @@ class MejorAbiertaHandler extends APIHandler
     {
 
         $data = Repo::author()
-            ->getCollector()
-            ->getMany();
+            ->getCollector();
 
+        if (is_string($args)) {
+            $this->initFilter($args, $data);
+        }
+
+        $data = $data->getMany();
 
         if ($request != null) {
             header('content-type: text/json');
@@ -183,9 +191,15 @@ class MejorAbiertaHandler extends APIHandler
     public function user($args, $request)
     {
         $data = Repo::user()
-            ->getCollector()
-            ->getMany();
+            ->getCollector();
 
+        if (is_string($args)) {
+            $this->initFilter($args, $data);
+        } else if (isset($args[0])) {
+            $data->filterByUserIds([$args[0]]);
+        }
+
+        $data = $data->getMany();
 
         if ($request != null) {
             header('content-type: text/json');
@@ -199,9 +213,13 @@ class MejorAbiertaHandler extends APIHandler
     {
 
         $data = Repo::decision()
-            ->getCollector()
-            ->getMany();
+            ->getCollector();
 
+        if (is_string($args)) {
+            $this->initFilter($args, $data);
+        }
+
+        $data = $data->getMany();
 
         if ($request != null) {
             header('content-type: text/json');
@@ -217,8 +235,13 @@ class MejorAbiertaHandler extends APIHandler
         $contextId = Application::CONTEXT_JOURNAL;
         $data = Repo::institution()
             ->getCollector()
-            ->filterByContextIds([$contextId])
-            ->getMany();
+            ->filterByContextIds([$contextId]);
+
+        if (is_string($args)) {
+            $this->initFilter($args, $data);
+        }
+
+        $data = $data->getMany();
 
 
         if ($request != null) {
@@ -333,11 +356,12 @@ class MejorAbiertaHandler extends APIHandler
             ->getCollector()
             ->filterByRoleIds([Role::ROLE_ID_REVIEWER]);
 
-
-
-        if (isset($args[0])) {
+        if (is_string($args)) {
+            $this->initFilter($args, $data);
+        } else if (isset($args[0])) {
             $data->filterByUserIds([$args[0]]);
         }
+
 
         $data = $data->getMany();
 
@@ -350,16 +374,6 @@ class MejorAbiertaHandler extends APIHandler
         }
     }
 
-    function filter($s, $symbol)
-    {
-        $parts = explode($symbol, $s);
-        if (count($parts) > 1) {
-            echo 'The string contains a comma.';
-        } else {
-            echo 'The string does not contain a comma.';
-            $parts = explode('=', $args);
-        }
-    }
 
 
 
@@ -416,22 +430,18 @@ class MejorAbiertaHandler extends APIHandler
 
     function submissions($args, $request)
     {
-        /*
-        public const STATUS_QUEUED = 1;
-        public const STATUS_PUBLISHED = 3;
-        public const STATUS_DECLINED = 4;
-        public const STATUS_SCHEDULED = 5;
-        */
 
         $contextId = Application::CONTEXT_JOURNAL;
         $data = Repo::submission()
             ->getCollector()
             ->filterByContextIds([$contextId]);
-        //->filterByStatus($status)
 
-        if (isset($args[0])) {
+        if (is_string($args)) {
+            $this->initFilter($args, $data);
+        } else if (isset($args[0])) {
             $data->filterByIssueIds([$args[0]]);
         }
+
         $data = $data->getMany();
         /*
         $filteredElements = $submissions->filter(function ($element) {
@@ -447,6 +457,172 @@ class MejorAbiertaHandler extends APIHandler
         }
     }
 
+    function filter($fun, $param, $data)
+    {
+        $paramparts = explode(',', $param);
+
+        if (count($paramparts) > 1) {
+            $paramsFormated = [$param];
+        } else {
+            $paramsFormated = $paramparts;
+        }
+        switch ($fun) {
+            case 'year':                                        //issues
+                $data->filterByYears($paramsFormated);
+                break;
+            case 'published':                                   //issues
+                $data->filterByPublished($param == "true");
+                break;
+            case 'hasdois':                                     //issues,submissions
+                $data->filterByHasDois($param == "true");
+                break;
+            case 'volumes':                                     //issues 
+                $data->filterByVolumes($paramsFormated);
+                break;
+            case 'titles':                                      //issues,section
+                $data->filterByTitles($paramsFormated);
+                break;
+            case 'numbers':                                     //issues
+                $data->filterByNumbers($paramsFormated);
+                break;
+            case 'status':                                      //submissions,user                                     
+                $data->filterByStatus($paramsFormated);
+                break;
+            case 'doistatuses':                                 //issues,submissions
+                $data->filterByDoiStatuses($paramsFormated);
+                break;
+            case 'issueids':                                    //issues,submissions
+                $data->filterByIssueIds($paramsFormated);
+                break;
+            case 'urlpath':                                     //issues
+                $data->filterByUrlPath($param);
+                break;
+            case 'categoryid':                                  //submissions
+                $data->filterByCategoryIds($paramsFormated);
+                break;
+            case 'daysinactive':                                //submissions
+                $data->filterByDaysInactive(intval($param));
+                break;
+            case 'incomplete':                                  //submissions
+                $data->filterByIncomplete($param == "true");
+                break;
+            case 'overdue':                                     //submissions
+                $data->filterByOverdue($param == "true");
+                break;
+            case 'sectionids':                                  //submissions
+                $data->filterBySectionIds($paramsFormated);
+                break;
+            case 'stageids':                                    //submissions,decision
+                $data->filterByStageIds($paramsFormated);
+                break;
+            case 'averagecompletion':                           //user
+                $data->filterByAverageCompletion(intval($param));
+                break;
+            case 'dayssincelastassignment':                     //user
+                $data->filterByDaysSinceLastAssignment(intval($param));
+                break;
+            case 'reviewerrating':                              //user
+                $data->filterByReviewerRating(intval($param));
+                break;
+            case 'reviewsactive':                               //user
+                $data->filterByReviewsActive(intval($param));
+                break;
+            case 'reviewscompleted':                            //user
+                $data->filterByReviewsCompleted(intval($param));
+                break;
+            case 'roleids':                                     //user
+                $data->filterByRoleIds($paramsFormated);
+                break;
+            case 'settings':                                    //user
+                $data->filterBySettings($paramsFormated);
+                break;
+            case 'workflowstageids':                            //user
+                $data->filterByWorkflowStageIds($paramsFormated);
+                break;
+            case 'ips':                                         //institutions
+                $data->filterByIps($paramsFormated);
+                break;
+            case 'decisiontypes':                               //decision
+                $data->filterByDecisionTypes($paramsFormated);
+                break;
+            case 'editorids':                                   //decision 
+                $data->filterByEditorIds($paramsFormated);
+                break;
+            case 'reviewroundids':                              //decision
+                $data->filterByReviewRoundIds($paramsFormated);
+                break;
+            case 'rounds':                                      //decision
+                $data->filterByRounds($paramsFormated);
+                break;
+            case 'submissionids':                               //decision
+                $data->filterBySubmissionIds($paramsFormated);
+                break;
+            case 'affiliation':                                 //author
+                $data->filterByAffiliation($paramsFormated);
+                break;
+            case 'country':                                     //author
+                $data->filterByCountry($paramsFormated);
+                break;
+            case 'includeinbrowse':                             //author
+                $data->filterByIncludeInBrowse($param == "true");
+                break;
+            case 'name':                                        //author
+                $data->filterByName($param);
+                break;
+            case 'publicationids':                              //author
+                $data->filterByPublicationIds($paramsFormated);
+                break;
+            case 'active': //YYYY-MM-DD                         //announcement 
+                $data->filterByActive($param);
+                break;
+            case 'typeids':                                     //announcement
+                $data->filterByTypeIds($paramsFormated);
+                break;
+            case 'abbrevs':                                     //section
+                $data->filterByAbbrevs($paramsFormated);
+                break;
+            case 'contextid':
+                $data->filterByContextIds($paramsFormated);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    function initFilter($args, $data)
+    {
+        try {
+            $parts = explode(';', $args);
+            if (count($parts) > 1) {
+                foreach ($parts as $key => $value) {
+                    $parts = explode('=', $value);
+                    if (count($parts) > 1) {
+                        $fun = $parts[0];
+                        $param = $parts[1];
+
+                        $this->filter($fun, $param, $data);
+                    } else {
+                        $parts = explode('>', $args);
+                    }
+                }
+            } else {
+                $parts = explode('=', $args);
+                if (count($parts) > 1) {
+                    $fun = $parts[0];
+                    $param = $parts[1];
+
+                    $this->filter($fun, $param, $data);
+                } else {
+                    $parts = explode('>', $args);
+                }
+            }
+        } catch (\Throwable $th) {
+            error_log("Error in filter: ".$th->getMessage());
+        }
+    }
+
+
     function issues($args, $request)
     {
 
@@ -454,41 +630,17 @@ class MejorAbiertaHandler extends APIHandler
         $data = Repo::issue()
             ->getCollector()
             ->filterByContextIds([$contextId]);
-        //  ->filterByPublished(true);
-        //  ->filterByStatus($status)
 
         //is string when recived from yaml
         if (is_string($args)) {
-            echo "params --->" . $args;
-            $parts = explode(';', $args);
-            if (count($parts) > 1) {
-                echo 'The string contains a comma.';
-            } else {
-                echo 'The string does not contain a comma.';
-                $parts = explode('=', $args);
-                if (count($parts) > 1) {
-                    $fun = $parts[0];
-                    $param = $parts[1];
-                    $paramparts = explode(',', $param);
 
-                    if ($fun == "year") {
-                        # code...
-                        if (count($parts) > 1) {
-                            $data->filterByYears([$param]);
-                        } else {
-                            $data->filterByYears($paramparts);
-                        }
-                    }
-                } else {
-                    $parts = explode('>', $args);
-                }
-            }
+            $this->initFilter($args, $data);
         } else if (isset($args[0])) {
             $data->filterByIssueIds([$args[0]]);
         }
         $data = $data->getMany();
 
-        
+
         $result = [];
         foreach ($data as $key => $item) {
             //echo json_encode($item->_data["id"]);
@@ -517,8 +669,12 @@ class MejorAbiertaHandler extends APIHandler
         $contextId = Application::CONTEXT_JOURNAL;
         $data = Repo::section()
             ->getCollector()
-            ->filterByContextIds([$contextId])
-            ->getMany();
+            ->filterByContextIds([$contextId]);
+
+        if (is_string($args)) {
+            $this->initFilter($args, $data);
+        }
+        $data = $data->getMany();
 
         if ($request != null) {
             header('content-type: text/json');
@@ -679,7 +835,6 @@ class MejorAbiertaHandler extends APIHandler
             } else {
                 error_log("Error creating file.");
             }
-
         } else {
             $dateStart = date('Y-01-01');
             $dateEnd = date('Y-m-d');

@@ -92,7 +92,6 @@ class MejorAbiertaReportForm extends Form
             'decision',
             'institution',
             'submissionFile',
-            'representation',
             'DAO',
             'submissions',
             'issues',
