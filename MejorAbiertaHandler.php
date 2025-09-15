@@ -618,7 +618,7 @@ class MejorAbiertaHandler extends APIHandler
                 }
             }
         } catch (\Throwable $th) {
-            error_log("Error in filter: ".$th->getMessage());
+            error_log("Error in filter: " . $th->getMessage());
         }
     }
 
@@ -772,6 +772,38 @@ class MejorAbiertaHandler extends APIHandler
         });
     }
 
+    function filterFileds($data, $fields)
+    {
+        if(is_string($data)){
+            return $data;
+        }/*
+        if (get_class($data) != 'Illuminate\Support\LazyCollection') {
+            $data = collect([$data]);
+        }*/
+        $result = [];
+
+
+
+
+        foreach ($data as $key => $item) {
+            $item = (array) $item;
+            $row = [];
+            if ($fields[0] == "") {
+                $result[] = $item;
+            } else {
+                foreach ($fields as $field) {
+                    if (isset($item['_data'][$field])) {
+                        $row[$field] = $item['_data'][$field];
+                    }
+                }
+                $result[] = $row;
+            }
+        }
+
+        // $result now contains only the selected fields
+        return $result;
+    }
+
     function parseyaml($args)
     {
         if (sizeof($args) <= 0) {
@@ -780,20 +812,32 @@ class MejorAbiertaHandler extends APIHandler
         $filePath = dirname(__FILE__, 1) . '/configs/' . $args[0] . '.yaml';
 
 
-
-        $yaml = Yaml::parseFile($filePath);
+        try {
+            $yaml = Yaml::parseFile($filePath);
+        } catch (\Throwable $th) {
+            return "Invalid yaml </br> $th";
+        }
+        
 
         //print_r($yaml);
-        echo "ID de la configuración: " . $yaml['report']['config']['id'] . "\n";
+        echo "ID de la configuración: " . $yaml['report']['config']['id'] . "</br>";
         echo "Nombre de la configuración: " . $yaml['report']['config']['name']     . "\n";
 
         foreach ($yaml['report']['data'] as $data) {
-            echo "description: " . $data['title'] . "</br>";
+            echo "description: " . $data['description'] . "</br>";
             echo "operation: " . $data['operation'] . "</br>";
             echo "params: " . $data['params'] . "</br>";
+            echo "fields: " . $data['output']['fields'] . "</br>";
+            $fields = explode(",", $data['output']['fields']);
+            if (count($fields) == 0) {
+                $fields = [$data['output']['fields']];
+            }
+
             $output = call_user_func([$this, $data['operation']], $data['params'], "");
-            echo $data['output']['fields'];
-            echo $output;
+
+            $filtered = $this->filterFileds($output, $fields);
+            //echo $data['output']['fields'];
+            echo json_encode($filtered);
         }
     }
 
@@ -824,9 +868,26 @@ class MejorAbiertaHandler extends APIHandler
         if ($request->isPost($request)) {
             $reportParams = $request->getUserVars();
 
+            $filename =  $reportParams['titlefile'];
+
+            if ($filename == "") {
+                return "Invalid title file";
+            }
+            $content = $reportParams['textyaml'];
+            try {
+                $yaml = Yaml::parse($content);
+            } catch (\Throwable $th) {
+                return "Invalid yaml </br> $th";
+            }
+            
+            if ($content == "") {
+                return "Invalid yaml";
+            }
+
             $filePath = dirname(__FILE__, 1) . '/configs/' . $reportParams['titlefile'] . '.yaml';
 
             $content = $reportParams['textyaml'];
+
 
             if ($fp = fopen($filePath, 'w')) {
                 fwrite($fp, $content);

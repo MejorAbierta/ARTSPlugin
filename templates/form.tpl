@@ -22,7 +22,7 @@
 		{fbvFormArea}
 
 		{fbvElement readonly="on" type="textarea" id="textyaml" maxlength="250" inline=true size=$fbvStyles.size.MEDIUM}
-		{fbvElement type="text" id="titlefile"}
+		{fbvElement placeholder="plugins.generic.mejorAbierta.file" type="text" id="titlefile" }
 		
 		<input class="pkp_button submitFormButton" type="submit"
 			value="{translate key="plugins.generic.mejorAbierta.accept"}" class="button defaultButton" />
@@ -79,23 +79,28 @@
 				</section>
 				</br>
 				{translate key='plugins.generic.mejorAbierta.filter'}
-				<input class="field text" type="text" id="params" />
+				</br>
+				<textarea class="field text"  id="params"></textarea>
 				</br>
 				</br>
 				{translate key='plugins.generic.mejorAbierta.fields'}
-				<input class="field text" type="text" id="fields" />
+				</br>
+				<textarea class="field text"  id="fields" ></textarea>
 				</br>
 				</br>
 				{translate key='plugins.generic.mejorAbierta.description'}
-				<input class="field text" type="text" id="title" />
+				<input class="field text"  id="title" />
 
 				<p>
+					
+					<strong>WARNING!</strong> Is recommended the use of filter to avoid big querys.
+
 					<strong>Filter</strong>: If are available the filterByMethod you like to use.</br>
-					&nbsp;&nbsp;&nbsp;&nbsp; Example for reviewers: Year>2023,Year<2025 
+					&nbsp;&nbsp;&nbsp;&nbsp; Example for reviewers: Year=2023,2025;
 					</br>
 					<strong>Fields</strong>: FieldName.</br>
 					&nbsp;&nbsp;&nbsp;&nbsp; Example for reviewers: id,userName,email 
-				
+									
 				</p>
 			</br>
 			</div>

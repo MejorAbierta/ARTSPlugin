@@ -7,9 +7,9 @@ report:
 
   data:
     - id: 01
-      title: Nombre de la Revista
+      description: Nombre de la Revista
       operation: userGroup
       params: 1
       output:
-        fields: title
+        fields: name
 

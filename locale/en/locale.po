@@ -33,7 +33,7 @@ msgid "plugins.generic.mejorAbierta.filter"
 msgstr "Filter"
 
 msgid "plugins.generic.mejorAbierta.fields"
-msgstr "fields"
+msgstr "Fields"
 
 msgid "plugins.generic.mejorAbierta.description"
 msgstr "Description"
@@ -46,3 +46,6 @@ msgstr "Authorization"
 
 msgid "plugins.generic.mejorAbierta.accept"
 msgstr "Accept"
+
+msgid "plugins.generic.mejorAbierta.file"
+msgstr "Title File"
