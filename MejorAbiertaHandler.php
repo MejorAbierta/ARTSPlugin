@@ -2,31 +2,18 @@
 
 namespace APP\plugins\generic\mejorAbierta;
 
-use APP\handler\Handler;
-
 use PKP\handler\APIHandler;
-use PKP\core\APIResponse;
-use Slim\Http\Request as SlimRequest;
 
 use APP\facades\Repo;
 use PKP\security\Role;
 use PKP\db\DAORegistry;
 use PKP\submission\PKPSubmission;
 use PKP\security\authorization\ContextAccessPolicy;
-use PKP\security\authorization\ContextRequiredPolicy;
-
-use PKP\security\authorization\UserRolesRequiredPolicy;
-use PKP\security\authorization\PolicySet;
-use PKP\security\authorization\RoleBasedHandlerOperationPolicy;
-
-use APP\security\authorization\OjsIssueRequiredPolicy;
-use APP\security\authorization\OjsJournalMustPublishPolicy;
-
-use PKP\security\authorization\PKPSiteAccessPolicy;
 
 use Symfony\Component\Yaml\Yaml;
 use APP\core\Application;
 
+require_once __DIR__ . '/Utils.php';
 
 class MejorAbiertaHandler extends APIHandler
 {
@@ -38,6 +25,7 @@ class MejorAbiertaHandler extends APIHandler
         // 'givenName',
         'accessStatus'
     ];
+    var $customfilters = [];
 
     private $plugin;
 
@@ -147,7 +135,7 @@ class MejorAbiertaHandler extends APIHandler
         return parent::authorize($request, $args, $roleAssignments);
     }*/
 
-    public function announcement($args, $request)
+    public function announcement($args, $request, $fromyaml)
     {
 
         $data = Repo::announcement()
@@ -159,7 +147,7 @@ class MejorAbiertaHandler extends APIHandler
 
         $data = $data->getMany();
 
-        if ($request != null) {
+        if ($fromyaml == null) {
             header('content-type: text/json');
             echo json_encode($data);
         } else {
@@ -167,7 +155,7 @@ class MejorAbiertaHandler extends APIHandler
         }
     }
 
-    public function author($args, $request)
+    public function author($args, $request, $fromyaml)
     {
 
         $data = Repo::author()
@@ -179,7 +167,7 @@ class MejorAbiertaHandler extends APIHandler
 
         $data = $data->getMany();
 
-        if ($request != null) {
+        if ($fromyaml == null) {
             header('content-type: text/json');
             echo json_encode($data);
         } else {
@@ -188,7 +176,7 @@ class MejorAbiertaHandler extends APIHandler
     }
 
 
-    public function user($args, $request)
+    public function user($args, $request, $fromyaml)
     {
         $data = Repo::user()
             ->getCollector();
@@ -201,7 +189,7 @@ class MejorAbiertaHandler extends APIHandler
 
         $data = $data->getMany();
 
-        if ($request != null) {
+        if ($fromyaml == null) {
             header('content-type: text/json');
             echo json_encode($data);
         } else {
@@ -209,7 +197,7 @@ class MejorAbiertaHandler extends APIHandler
         }
     }
 
-    public function decision($args, $request)
+    public function decision($args, $request, $fromyaml)
     {
 
         $data = Repo::decision()
@@ -221,7 +209,7 @@ class MejorAbiertaHandler extends APIHandler
 
         $data = $data->getMany();
 
-        if ($request != null) {
+        if ($fromyaml == null) {
             header('content-type: text/json');
             echo json_encode($data);
         } else {
@@ -229,7 +217,7 @@ class MejorAbiertaHandler extends APIHandler
         }
     }
 
-    public function institution($args, $request)
+    public function institution($args, $request, $fromyaml)
     {
 
         $contextId = Application::CONTEXT_JOURNAL;
@@ -244,7 +232,7 @@ class MejorAbiertaHandler extends APIHandler
         $data = $data->getMany();
 
 
-        if ($request != null) {
+        if ($fromyaml == null) {
             header('content-type: text/json');
             echo json_encode($data);
         } else {
@@ -253,7 +241,7 @@ class MejorAbiertaHandler extends APIHandler
     }
 
 
-    function submissionFile($args, $request)
+    function submissionFile($args, $request, $fromyaml)
     {
 
         $data = Repo::submissionFile()
@@ -349,7 +337,7 @@ class MejorAbiertaHandler extends APIHandler
     }
 
 
-    public function reviewers($args, $request)
+    public function reviewers($args, $request, $fromyaml)
     {
 
         $data = Repo::user()
@@ -366,7 +354,7 @@ class MejorAbiertaHandler extends APIHandler
         $data = $data->getMany();
 
 
-        if ($request != null) {
+        if ($fromyaml == null) {
             header('content-type: text/json');
             return json_encode($data);
         } else {
@@ -378,7 +366,7 @@ class MejorAbiertaHandler extends APIHandler
 
 
 
-    function journalIdentity()
+    function journalIdentity($args, $request, $fromyaml)
     {
         $contextId = Application::CONTEXT_JOURNAL;
         /** @var ContextDAO $contextDao */
@@ -397,11 +385,20 @@ class MejorAbiertaHandler extends APIHandler
         $context->onlineIssn = $context->getSetting('onlineIssn');
         $context->publisherInstitution = $context->getSetting('publisherInstitution');
 
-        echo json_encode($this->anonimizeData($context));
+        if (is_string($args)) {
+            $this->initFilter($args, $context);
+        }
+
+        if ($fromyaml == null) {
+            header('content-type: text/json');
+            echo json_encode($context);
+        } else {
+            return $context;
+        }
     }
 
 
-    function DAO($args, $request)
+    function DAO($args, $request, $fromyaml)
     {
         if (isset($args[0])) {
             $data = DAORegistry::getDAO($args[0]);
@@ -409,7 +406,7 @@ class MejorAbiertaHandler extends APIHandler
             $data = DAORegistry::getDAOs();
         }
 
-        if ($request != null) {
+        if ($fromyaml == null) {
             header('content-type: text/json');
             echo json_encode($data);
         } else {
@@ -417,18 +414,34 @@ class MejorAbiertaHandler extends APIHandler
         }
     }
 
-    function about($args, $request): string
+    function about($args, $request, $fromyaml)
     {
+
+
+
         $contextId = Application::CONTEXT_JOURNAL;
         /** @var ContextDAO $contextDao */
         $contextDao = Application::getContextDAO();
         /** @var Context $context */
         $context = $contextDao->getById($contextId);
-        return implode(",", $context->getData('about'));
+        $data = $context->getData('about');
+
+        if (is_string($args)) {
+            $data = $context->getData($args);
+        } else if (isset($args[0])) {
+            $data = $context->getData($args[0]);
+        }
+
+        if ($fromyaml == null) {
+            header('content-type: text/json');
+            echo json_encode($data);
+        } else {
+            return $data;
+        }
     }
 
 
-    function submissions($args, $request)
+    function submissions($args, $request, $fromyaml)
     {
 
         $contextId = Application::CONTEXT_JOURNAL;
@@ -449,7 +462,7 @@ class MejorAbiertaHandler extends APIHandler
         });
         */
 
-        if ($request != null) {
+        if ($fromyaml == null) {
             header('content-type: text/json');
             echo json_encode($data);
         } else {
@@ -584,14 +597,41 @@ class MejorAbiertaHandler extends APIHandler
             case 'contextid':
                 $data->filterByContextIds($paramsFormated);
                 break;
-
             default:
                 break;
         }
     }
 
+    function filterBy($data, $filtername, $value)
+    {
+        if ($data == null) {
+            return "No data";
+        }
+
+        if (is_string($data)) {
+            return $data;
+        }
+
+        $result = [];
+        foreach ($data as $key => $item) {
+            $item = (array) $item;
+            if (isset($item['_data'][$filtername]['en'])) {
+                if (strtolower($item['_data'][$filtername]['en']) == strtolower($value)) {
+                    $result[] = $item;
+                }
+            } else if (isset($item['_data'][$filtername])) {
+                if (strtolower($item['_data'][$filtername]) == strtolower($value)) {
+                    $result[] = $item;
+                }
+            }
+        }
+
+        return $result;
+    }
+
     function initFilter($args, $data)
     {
+        $this->customfilters = [];
         try {
             $parts = explode(';', $args);
             if (count($parts) > 1) {
@@ -601,9 +641,13 @@ class MejorAbiertaHandler extends APIHandler
                         $fun = $parts[0];
                         $param = $parts[1];
 
-                        $this->filter($fun, $param, $data);
+                        try {
+                            $this->filter($fun, $param, $data);
+                        } catch (\Throwable $th) {
+                            $this->customfilters[] = [$fun, $param];
+                        }
                     } else {
-                        $parts = explode('>', $args);
+                        //$parts = explode('>', $args);
                     }
                 }
             } else {
@@ -611,19 +655,23 @@ class MejorAbiertaHandler extends APIHandler
                 if (count($parts) > 1) {
                     $fun = $parts[0];
                     $param = $parts[1];
-
-                    $this->filter($fun, $param, $data);
+                    try {
+                        $this->filter($fun, $param, $data);
+                    } catch (\Throwable $th) {
+                        $this->customfilters[] = [$fun, $param];
+                    }
                 } else {
-                    $parts = explode('>', $args);
+                    //$parts = explode('>', $args);
                 }
             }
         } catch (\Throwable $th) {
+            echo (json_encode($th->getMessage()));
             error_log("Error in filter: " . $th->getMessage());
         }
     }
 
 
-    function issues($args, $request)
+    function issues($args, $request, $fromyaml)
     {
 
         $contextId = Application::CONTEXT_JOURNAL;
@@ -655,7 +703,7 @@ class MejorAbiertaHandler extends APIHandler
             $result[] = $item;
         }
 
-        if ($request != null) {
+        if ($fromyaml == null) {
             header('content-type: text/json');
             echo json_encode($data);
         } else {
@@ -664,7 +712,7 @@ class MejorAbiertaHandler extends APIHandler
         //echo json_encode($this->anonimizeData($data));
     }
 
-    function section($args, $request)
+    function section($args, $request, $fromyaml)
     {
         $contextId = Application::CONTEXT_JOURNAL;
         $data = Repo::section()
@@ -676,7 +724,7 @@ class MejorAbiertaHandler extends APIHandler
         }
         $data = $data->getMany();
 
-        if ($request != null) {
+        if ($fromyaml == null) {
             header('content-type: text/json');
             echo json_encode($data);
         } else {
@@ -684,7 +732,7 @@ class MejorAbiertaHandler extends APIHandler
         }
     }
 
-    function urls($args, $request)
+    function urls($args, $request, $fromyaml)
     {
         $router = $request->getRouter();
         $dispatcher = $router->getDispatcher();
@@ -696,7 +744,7 @@ class MejorAbiertaHandler extends APIHandler
         $data["privacy"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about', 'privacy');
         $data["contact"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about', 'contact');
 
-        if ($request != null) {
+        if ($fromyaml == null) {
             header('content-type: text/json');
             echo json_encode($data);
         } else {
@@ -704,7 +752,7 @@ class MejorAbiertaHandler extends APIHandler
         }
     }
 
-    function reviews($args, $request)
+    function reviews($args, $request, $fromyaml)
     {
         //this seems to return empty...?
         $submissionId = $args[0];
@@ -712,7 +760,7 @@ class MejorAbiertaHandler extends APIHandler
         $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
         $data = $reviewAssignmentDao->getBySubmissionId($submissionId);
 
-        if ($request != null) {
+        if ($fromyaml == null) {
             header('content-type: text/json');
             echo json_encode($data);
         } else {
@@ -720,7 +768,7 @@ class MejorAbiertaHandler extends APIHandler
         }
     }
 
-    function eventlogs($args, $request)
+    function eventlogs($args, $request, $fromyaml)
     {
         if (!isset($args[0])) {
             error_log("submission id expected");
@@ -734,7 +782,7 @@ class MejorAbiertaHandler extends APIHandler
             ->filterByAssoc(Application::ASSOC_TYPE_SUBMISSION, [$submissionId])
             ->getMany();
 
-        if ($request != null) {
+        if ($fromyaml == null) {
             header('content-type: text/json');
             echo json_encode($data);
         } else {
@@ -774,7 +822,11 @@ class MejorAbiertaHandler extends APIHandler
 
     function filterFileds($data, $fields)
     {
-        if(is_string($data)){
+        if ($data == null) {
+            return "No data";
+        }
+
+        if (is_string($data)) {
             return $data;
         }/*
         if (get_class($data) != 'Illuminate\Support\LazyCollection') {
@@ -788,12 +840,19 @@ class MejorAbiertaHandler extends APIHandler
         foreach ($data as $key => $item) {
             $item = (array) $item;
             $row = [];
+
             if ($fields[0] == "") {
-                $result[] = $item;
+                if (isset($item['_data'])) {
+                    $result[] = $item['_data'];
+                } else {
+                    $result[] = $item;
+                }
             } else {
                 foreach ($fields as $field) {
                     if (isset($item['_data'][$field])) {
                         $row[$field] = $item['_data'][$field];
+                    } else if (isset($item[$field])) {
+                        $row[$field] = $item[$field];
                     }
                 }
                 $result[] = $row;
@@ -804,44 +863,85 @@ class MejorAbiertaHandler extends APIHandler
         return $result;
     }
 
-    function parseyaml($args)
+
+
+    function parseyaml($args, $request, $fromyaml = "yes")
     {
+
         if (sizeof($args) <= 0) {
             return;
         }
+        
         $filePath = dirname(__FILE__, 1) . '/configs/' . $args[0] . '.yaml';
-
 
         try {
             $yaml = Yaml::parseFile($filePath);
         } catch (\Throwable $th) {
             return "Invalid yaml </br> $th";
         }
-        
+
+        $values = [];
 
         //print_r($yaml);
-        echo "ID de la configuración: " . $yaml['report']['config']['id'] . "</br>";
-        echo "Nombre de la configuración: " . $yaml['report']['config']['name']     . "\n";
+        //echo "ID: " . $yaml['report']['config']['id'] . "</br>";
+        //echo "Name: " . $yaml['report']['config']['name']     . "</br>";
 
         foreach ($yaml['report']['data'] as $data) {
-            echo "description: " . $data['description'] . "</br>";
-            echo "operation: " . $data['operation'] . "</br>";
-            echo "params: " . $data['params'] . "</br>";
-            echo "fields: " . $data['output']['fields'] . "</br>";
+            //echo "Description: </br>" . str_replace("\n", "</br>", $data['description']) . "</br>";
+            //echo "Operation: " . $data['operation'] . "</br>";
+            //echo "Filter: " . $data['params'] . "</br>";
+            //echo "Fields: " . $data['output']['fields'] . "</br>";
             $fields = explode(",", $data['output']['fields']);
             if (count($fields) == 0) {
                 $fields = [$data['output']['fields']];
             }
 
-            $output = call_user_func([$this, $data['operation']], $data['params'], "");
+            $this->customfilters = [];
+
+            $output = call_user_func([$this, $data['operation']], $data['params'], $request, $fromyaml);
+
+            if (count($this->customfilters) > 0) {
+                foreach ($this->customfilters as $key => $value) {
+                    $output = $this->filterBy($output, $value[0], $value[1]);
+                }
+            }
 
             $filtered = $this->filterFileds($output, $fields);
             //echo $data['output']['fields'];
-            echo json_encode($filtered);
+            if ($yaml['report']['config']['format'] == 'json') {
+                header('content-type: text/json');
+                echo json_encode($filtered);
+            }
+
+            if ($yaml['report']['config']['format'] == 'csv') {
+                $csv = json_to_csv_string(json_encode($filtered));
+                header('Content-Type: text/csv; charset=utf-8');
+                header('Content-Disposition: attachment; filename="export.csv"');
+                echo $csv;
+            }
+
+            if ($yaml['report']['config']['format'] == 'html') {
+                $form = new MejorAbiertaReportTemplate($this->plugin,$yaml['report']['config']['template']);
+                $form->initData();
+                if ($request->isPost($request)) {
+  
+                } else {
+                    $form->display($request, $yaml['report']['config']['template'], [$filtered]);
+                }
+            }
+
+            if (isset($data['output']['operation']))
+                if ($data['output']['operation'] == 'count') {
+                    echo "</br>Operation: " . $data['output']['operation'] . ":";
+                    echo count($output);
+                    $values[$data['id']] = count($output);
+                }
+
+            //echo "</br>-------------------</br>";
         }
     }
 
-    function userGroup($args, $request)
+    function userGroup($args, $request, $fromyaml)
     {
         $data = Repo::userGroup()
             ->getCollector();
@@ -852,7 +952,7 @@ class MejorAbiertaHandler extends APIHandler
 
         $data = $data->getMany();
 
-        if ($request != null) {
+        if ($fromyaml == null) {
             header('content-type: text/json');
             echo json_encode($data);
         } else {
@@ -879,7 +979,7 @@ class MejorAbiertaHandler extends APIHandler
             } catch (\Throwable $th) {
                 return "Invalid yaml </br> $th";
             }
-            
+
             if ($content == "") {
                 return "Invalid yaml";
             }

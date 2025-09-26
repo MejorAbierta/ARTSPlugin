@@ -4,12 +4,12 @@
 	<h1>{translate key='plugins.generic.mejorAbierta.displayName'}</h1>
 	Current configuration files:
 	<ul>
-	
-	{foreach from=$filesnames item=item key=key name=name}
-		
-		<li><a href="{$baseURL}{$item}"> {$item}</a></li>
-		
-	{/foreach}
+
+		{foreach from=$filesnames item=item key=key name=name}
+
+			<li><a href="{$baseURL}{$item}"> {$item}</a></li>
+
+		{/foreach}
 	</ul>
 	Create new yaml configuration file:
 	</br>
@@ -23,7 +23,7 @@
 
 		{fbvElement readonly="on" type="textarea" id="textyaml" maxlength="250" inline=true size=$fbvStyles.size.MEDIUM}
 		{fbvElement placeholder="plugins.generic.mejorAbierta.file" type="text" id="titlefile" }
-		
+
 		<input class="pkp_button submitFormButton" type="submit"
 			value="{translate key="plugins.generic.mejorAbierta.accept"}" class="button defaultButton" />
 
@@ -36,18 +36,21 @@
 			box-sizing: border-box;
 			width: 500px;
 		}
-		p{
+
+		p {
 			color: gray;
 		}
-		.ma {
 
-		}
+		.ma {}
 
 		.dropdown {
 			width: 27vh;
 		}
 
 		#textyaml {
+			width: 100%;
+		}
+		.textyaml{
 			width: 100%;
 		}
 	</style>
@@ -80,29 +83,30 @@
 				</br>
 				{translate key='plugins.generic.mejorAbierta.filter'}
 				</br>
-				<textarea class="field text"  id="params"></textarea>
+				<textarea class="field text textyaml" id="params"></textarea>
 				</br>
 				</br>
 				{translate key='plugins.generic.mejorAbierta.fields'}
 				</br>
-				<textarea class="field text"  id="fields" ></textarea>
+				<textarea class="field text textyaml" id="fields"></textarea>
 				</br>
 				</br>
 				{translate key='plugins.generic.mejorAbierta.description'}
-				<input class="field text"  id="title" />
+				</br>
+				<textarea class="field text textyaml" id="title" ></textarea>
 
 				<p>
-					
+
 					<strong>WARNING!</strong> Is recommended the use of filter to avoid big querys.
 
 					<strong>Filter</strong>: If are available the filterByMethod you like to use.</br>
 					&nbsp;&nbsp;&nbsp;&nbsp; Example for reviewers: Year=2023,2025;
 					</br>
 					<strong>Fields</strong>: FieldName.</br>
-					&nbsp;&nbsp;&nbsp;&nbsp; Example for reviewers: id,userName,email 
-									
+					&nbsp;&nbsp;&nbsp;&nbsp; Example for reviewers: id,userName,email
+
 				</p>
-			</br>
+				</br>
 			</div>
 			<button id="addConfigButton" class="pkp_button"> {translate key='plugins.generic.mejorAbierta.add'}</button>
 
@@ -147,6 +151,21 @@
 						{foreach from=$formats item=format key=name}
 
 							<option value="{$format}">{$format}</option>
+
+						{/foreach}
+					</select>
+				</section>
+				</br>
+				</br>
+
+				{translate key='plugins.generic.mejorAbierta.operation'}
+				<section>
+
+					<select id="operationheader" class="styled-select dropdown">
+						<option value=""> -- {translate key='plugins.generic.mejorAbierta.operation'} --</option>
+						{foreach from=$operationsheader item=operationheader key=name}
+
+							<option value="{$operationheader}">{$operationheader}</option>
 
 						{/foreach}
 					</select>
@@ -201,7 +220,7 @@
 				var title = document.getElementById('name');
 				var auth = document.getElementById('auth');
 				var format = document.getElementById('format');
-
+				var operation = document.getElementById('operationheader');
 
 
 				textarea.value += "report:\n" +
@@ -210,6 +229,7 @@
 					"    name: " + title.value + "\n" +
 					"    authorization: " + auth.value + "\n" +
 					"    format: " + format.value + "\n" +
+					"    operation: " + operation.value + "\n" +
 					"  data:\n";
 				autoResizeTextarea(textarea);
 

@@ -4,12 +4,20 @@ report:
     name: Informe FECYT 2025
     authorization: role
     format: json
-
+    operation: count
+    
   data:
     - id: 01
-      description: Nombre de la Revista
-      operation: userGroup
-      params: 1
+      description: Publications
+      operation: reviewers
+      params: affiliation=URJC
       output:
-        fields: name
+        fields: userName
+
+    - id: 02
+      description: Publications
+      operation: reviewers
+      params: 
+      output:
+        fields: userName
 
