@@ -1,4 +1,4 @@
-# mejorAbiertaPlugin
+# Advanced Report Tool Suite - ARTS
 
 
 ### Example YAML
