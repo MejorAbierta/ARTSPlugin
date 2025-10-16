@@ -14,7 +14,6 @@ use Symfony\Component\Yaml\Yaml;
 use APP\core\Application;
 
 require_once __DIR__ . '/Utils.php';
-require_once __DIR__ . '/classes/Api.php';
 
 class MejorAbiertaHandler extends APIHandler
 {
