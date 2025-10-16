@@ -50,7 +50,7 @@ class MejorAbiertaReportTemplate extends Form
 
         
         $templateManager->assign('application', $this->application);
-        $templateManager->assign('data', $args[0]);
+        $templateManager->assign('data', $args);
 
 
         $templateManager->display($this->plugin->getTemplateResource($template));

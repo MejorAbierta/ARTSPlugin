@@ -14,6 +14,7 @@ use Symfony\Component\Yaml\Yaml;
 use APP\core\Application;
 
 require_once __DIR__ . '/Utils.php';
+require_once __DIR__ . '/classes/Api.php';
 
 class MejorAbiertaHandler extends APIHandler
 {
@@ -135,7 +136,7 @@ class MejorAbiertaHandler extends APIHandler
         return parent::authorize($request, $args, $roleAssignments);
     }*/
 
-    public function announcement($args, $request, $fromyaml)
+    public function announcement($args, $request, $fromyaml = null)
     {
 
         $data = Repo::announcement()
@@ -155,7 +156,7 @@ class MejorAbiertaHandler extends APIHandler
         }
     }
 
-    public function author($args, $request, $fromyaml)
+    public function author($args, $request, $fromyaml = null)
     {
 
         $data = Repo::author()
@@ -176,7 +177,7 @@ class MejorAbiertaHandler extends APIHandler
     }
 
 
-    public function user($args, $request, $fromyaml)
+    public function user($args, $request, $fromyaml = null)
     {
         $data = Repo::user()
             ->getCollector();
@@ -197,7 +198,7 @@ class MejorAbiertaHandler extends APIHandler
         }
     }
 
-    public function decision($args, $request, $fromyaml)
+    public function decision($args, $request, $fromyaml = null)
     {
 
         $data = Repo::decision()
@@ -217,7 +218,7 @@ class MejorAbiertaHandler extends APIHandler
         }
     }
 
-    public function institution($args, $request, $fromyaml)
+    public function institution($args, $request, $fromyaml = null)
     {
 
         $contextId = Application::CONTEXT_JOURNAL;
@@ -241,7 +242,7 @@ class MejorAbiertaHandler extends APIHandler
     }
 
 
-    function submissionFile($args, $request, $fromyaml)
+    function submissionFile($args, $request, $fromyaml = null)
     {
 
         $data = Repo::submissionFile()
@@ -337,7 +338,7 @@ class MejorAbiertaHandler extends APIHandler
     }
 
 
-    public function reviewers($args, $request, $fromyaml)
+    public function reviewers($args, $request, $fromyaml = null)
     {
 
         $data = Repo::user()
@@ -366,7 +367,7 @@ class MejorAbiertaHandler extends APIHandler
 
 
 
-    function journalIdentity($args, $request, $fromyaml)
+    function journalIdentity($args, $request, $fromyaml = null)
     {
         $contextId = Application::CONTEXT_JOURNAL;
         /** @var ContextDAO $contextDao */
@@ -398,7 +399,7 @@ class MejorAbiertaHandler extends APIHandler
     }
 
 
-    function DAO($args, $request, $fromyaml)
+    function DAO($args, $request, $fromyaml = null)
     {
         if (isset($args[0])) {
             $data = DAORegistry::getDAO($args[0]);
@@ -414,7 +415,7 @@ class MejorAbiertaHandler extends APIHandler
         }
     }
 
-    function about($args, $request, $fromyaml)
+    function about($args, $request, $fromyaml = null)
     {
 
 
@@ -434,14 +435,14 @@ class MejorAbiertaHandler extends APIHandler
 
         if ($fromyaml == null) {
             header('content-type: text/json');
-            echo json_encode($data);
+            return json_encode($data);
         } else {
             return $data;
         }
     }
 
 
-    function submissions($args, $request, $fromyaml)
+    function submissions($args, $request, $fromyaml = null)
     {
 
         $contextId = Application::CONTEXT_JOURNAL;
@@ -598,6 +599,7 @@ class MejorAbiertaHandler extends APIHandler
                 $data->filterByContextIds($paramsFormated);
                 break;
             default:
+                $this->customfilters[] = [$fun, $param];
                 break;
         }
     }
@@ -615,12 +617,31 @@ class MejorAbiertaHandler extends APIHandler
         $result = [];
         foreach ($data as $key => $item) {
             $item = (array) $item;
+
+
+
             if (isset($item['_data'][$filtername]['en'])) {
-                if (strtolower($item['_data'][$filtername]['en']) == strtolower($value)) {
-                    $result[] = $item;
+                if (str_contains($filtername, 'date')) {
+                    if (substr(strtolower($item['_data'][$filtername]), 0, strlen($value)) == strtolower($value)) {
+                        $result[] = $item;
+                    }
+                } else {
+                    if (strtolower($item['_data'][$filtername]) == strtolower($value)) {
+                        $result[] = $item;
+                    }
                 }
             } else if (isset($item['_data'][$filtername])) {
-                if (strtolower($item['_data'][$filtername]) == strtolower($value)) {
+                if (str_contains($filtername, 'date')) {
+                    if (substr(strtolower($item['_data'][$filtername]), 0, strlen($value)) == strtolower($value)) {
+                        $result[] = $item;
+                    }
+                } else {
+                    if (strtolower($item['_data'][$filtername]) == strtolower($value)) {
+                        $result[] = $item;
+                    }
+                }
+            } else if (isset($item[$filtername])) {
+                if (strtolower($item[$filtername]) == strtolower($value)) {
                     $result[] = $item;
                 }
             }
@@ -628,6 +649,8 @@ class MejorAbiertaHandler extends APIHandler
 
         return $result;
     }
+
+    function filterByDate() {}
 
     function initFilter($args, $data)
     {
@@ -642,6 +665,7 @@ class MejorAbiertaHandler extends APIHandler
                         $param = $parts[1];
 
                         try {
+
                             $this->filter($fun, $param, $data);
                         } catch (\Throwable $th) {
                             $this->customfilters[] = [$fun, $param];
@@ -671,7 +695,7 @@ class MejorAbiertaHandler extends APIHandler
     }
 
 
-    function issues($args, $request, $fromyaml)
+    function issues($args, $request, $fromyaml = null)
     {
 
         $contextId = Application::CONTEXT_JOURNAL;
@@ -712,7 +736,7 @@ class MejorAbiertaHandler extends APIHandler
         //echo json_encode($this->anonimizeData($data));
     }
 
-    function section($args, $request, $fromyaml)
+    function section($args, $request, $fromyaml = null)
     {
         $contextId = Application::CONTEXT_JOURNAL;
         $data = Repo::section()
@@ -732,7 +756,7 @@ class MejorAbiertaHandler extends APIHandler
         }
     }
 
-    function urls($args, $request, $fromyaml)
+    function urls($args, $request, $fromyaml = null)
     {
         $router = $request->getRouter();
         $dispatcher = $router->getDispatcher();
@@ -752,13 +776,41 @@ class MejorAbiertaHandler extends APIHandler
         }
     }
 
-    function reviews($args, $request, $fromyaml)
+    function reviews($args, $request, $fromyaml = null)
     {
-        //this seems to return empty...?
-        $submissionId = $args[0];
 
-        $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
-        $data = $reviewAssignmentDao->getBySubmissionId($submissionId);
+
+        $contextId = Application::CONTEXT_JOURNAL;
+        $data = Repo::submission()
+            ->getCollector()
+            ->filterByContextIds([$contextId]);
+
+        if (is_string($args)) {
+            $this->initFilter($args, $data);
+        } else if (isset($args[0])) {
+            $data->filterByIssueIds([$args[0]]);
+        }
+
+        $data = $data->getMany();
+
+        if (count($this->customfilters) > 0) {
+            foreach ($this->customfilters as $key => $value) {
+                $data = $this->filterBy($data, $value[0], $value[1]);
+            }
+            $this->customfilters = [];
+        }
+
+        $ids = [];
+        foreach ($data as $obj) {
+            $ids[] = $obj['_data']['id'];
+        }
+
+        $data = [];
+
+        foreach ($ids as $id) {
+            $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
+            $data[] = $reviewAssignmentDao->getBySubmissionId($id);
+        }
 
         if ($fromyaml == null) {
             header('content-type: text/json');
@@ -768,7 +820,7 @@ class MejorAbiertaHandler extends APIHandler
         }
     }
 
-    function eventlogs($args, $request, $fromyaml)
+    function eventlogs($args, $request, $fromyaml = null)
     {
         if (!isset($args[0])) {
             error_log("submission id expected");
@@ -871,7 +923,7 @@ class MejorAbiertaHandler extends APIHandler
         if (sizeof($args) <= 0) {
             return;
         }
-        
+
         $filePath = dirname(__FILE__, 1) . '/configs/' . $args[0] . '.yaml';
 
         try {
@@ -882,15 +934,8 @@ class MejorAbiertaHandler extends APIHandler
 
         $values = [];
 
-        //print_r($yaml);
-        //echo "ID: " . $yaml['report']['config']['id'] . "</br>";
-        //echo "Name: " . $yaml['report']['config']['name']     . "</br>";
 
         foreach ($yaml['report']['data'] as $data) {
-            //echo "Description: </br>" . str_replace("\n", "</br>", $data['description']) . "</br>";
-            //echo "Operation: " . $data['operation'] . "</br>";
-            //echo "Filter: " . $data['params'] . "</br>";
-            //echo "Fields: " . $data['output']['fields'] . "</br>";
             $fields = explode(",", $data['output']['fields']);
             if (count($fields) == 0) {
                 $fields = [$data['output']['fields']];
@@ -907,41 +952,60 @@ class MejorAbiertaHandler extends APIHandler
             }
 
             $filtered = $this->filterFileds($output, $fields);
-            //echo $data['output']['fields'];
-            if ($yaml['report']['config']['format'] == 'json') {
+
+            if (isset($data['output']['operation'])) {
+                if ($data['output']['operation'] == 'count') {
+                    $filtered[$data['output']['operation']] = count($output);
+                }
+            }
+            if ($filtered != "No data") {
+
+                switch ($yaml['report']['config']['format']) {
+                    case 'csv':
+                        $values[$data['id']] = json_to_csv_string(json_encode($filtered));
+                        break;
+                    default:
+                        $values[$data['id']] = $filtered;
+                        break;
+                }
+            }
+        }
+        $simpleName = str_replace(" ", "_", $yaml['report']['config']['name']);
+        switch ($yaml['report']['config']['format']) {
+            case 'json':
                 header('content-type: text/json');
-                echo json_encode($filtered);
-            }
-
-            if ($yaml['report']['config']['format'] == 'csv') {
-                $csv = json_to_csv_string(json_encode($filtered));
-                header('Content-Type: text/csv; charset=utf-8');
-                header('Content-Disposition: attachment; filename="export.csv"');
-                echo $csv;
-            }
-
-            if ($yaml['report']['config']['format'] == 'html') {
-                $form = new MejorAbiertaReportTemplate($this->plugin,$yaml['report']['config']['template']);
+                return json_encode($values);
+                break;
+            case 'csv':
+                download_csvs($values, $simpleName);
+                break;
+            case 'html':
+                $form = new MejorAbiertaReportTemplate($this->plugin, $yaml['report']['config']['template']);
                 $form->initData();
                 if ($request->isPost($request)) {
-  
                 } else {
-                    $form->display($request, $yaml['report']['config']['template'], [$filtered]);
+                    $form->display($request, $yaml['report']['config']['template'], $values);
                 }
-            }
+                break;
+            case 'xml':
+                $dom = new \DOMDocument();
+                $root = $dom->createElement($simpleName);
+                $dom->appendChild($root);
+                arrayToXml($values, $root, $dom);
+                $dom->formatOutput = true;
+                header('Content-Type: application/xml; charset=UTF-8');
+                return $dom->saveXML();
 
-            if (isset($data['output']['operation']))
-                if ($data['output']['operation'] == 'count') {
-                    echo "</br>Operation: " . $data['output']['operation'] . ":";
-                    echo count($output);
-                    $values[$data['id']] = count($output);
-                }
+                break;
 
-            //echo "</br>-------------------</br>";
+            default:
+
+                break;
         }
     }
 
-    function userGroup($args, $request, $fromyaml)
+
+    function userGroup($args, $request, $fromyaml = null)
     {
         $data = Repo::userGroup()
             ->getCollector();
