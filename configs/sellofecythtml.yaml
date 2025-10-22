@@ -1,0 +1,119 @@
+report:
+  config:
+    id: 01
+    name: SelloFECYT2025
+    authorization: admin
+    format: html
+    template: fecyt.tpl
+
+  data:
+    # Export contents About
+    - id: about
+      description: Export contents About
+      operation: about
+      params: 
+      output:
+        fields:
+
+    # Export article documentation
+    - id: STATUS_QUEUED
+      description: Export article documentation
+      operation: submissions
+      params: status=1
+      output:
+        fields: id
+        operation: count
+
+    - id: STATUS_PUBLISHED
+      description: 
+      operation: submissions
+      params: status=3
+      output:
+        fields: id
+        operation: count
+
+    - id: STATUS_DECLINED
+      description: 
+      operation: submissions
+      params: status=4
+      output:
+        fields: id
+        operation: count
+
+    - id: STATUS_SCHEDULED
+      description: 
+      operation: submissions
+      params: status=5
+      output:
+        fields: id
+        operation: count
+
+      # Export author data
+    - id: Export_author_data
+      description: Export author data
+      operation: author
+      params: 
+      output:
+        fields: id,affiliation,familyName,givenName
+    
+    # Export reviewer data
+    - id: Export_reviewer_data
+      description: Export reviewer data
+      operation: reviewers
+      params: 
+      output:
+        fields: id,affiliation,familyName,givenName
+
+    # Export issues documentation
+    - id: Export_issues_documentation
+      description: Export issues documentation
+      operation: issues
+      params: 
+      output:
+        fields: volume,number,year
+
+    # Export journal identification data
+    - id: Export_journal_identification_data
+      description: Export journal identification data
+      operation: journalIdentity
+      params: 
+      output:
+        fields: name,printIssn,onlineIssn,publisherInstitution
+
+    # Export information from the article submission page
+    - id: Export_information_from_the_article_submission_page
+      description: Export information from the article submission page
+      operation: journalIdentity
+      params: 
+      output:
+        fields: name,authorGuidelines,submissionChecklist,copyrightNotice,privacyStatement
+    
+    - id: Export_information_from_the_article_submission_page_2
+      description: Export information from the article submission page
+      operation: section
+      params: 
+      output:
+        fields: title,policy
+
+    # Export URLs
+    - id: Export_URLs
+      description: Export URLs
+      operation: urls
+      params: 
+      output:
+        fields:
+
+    # Export editorial flow of the selected submission
+    - id: Export_editorial_flow_of_the_selected_submission_reviews
+      description: reviews
+      operation: reviews
+      params: status=3;dateSubmitted=2025
+      output:
+        fields:
+
+    - id: Export_editorial_flow_of_the_selected_submission_eventlogs
+      description: eventlogs
+      operation: eventlogs
+      params: status=3;dateSubmitted=2025
+      output:
+        fields:
