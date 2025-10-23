@@ -1,5 +1,22 @@
 # Advanced Report Tool Suite - ARTS
 
+#### Prerequisites
+
+- OJS version 3.4, later versions not tested yet
+- A compressed file containing the plugin (.tar.gz)
+
+#### Installation Steps
+
+1. Download the Plugin from [releases](https://github.com/MejorAbierta/ARTSPlugin/releases)
+
+2. Log in to your OJS installation as an administrator.
+
+3. Navigate to the Plugin Management Page, click on the "Settings" icon (gear icon) in the top right corner of the screen and select "Plugins" from the dropdown menu.
+
+4. Upload the Plugin, On the Plugin Management page, click on the "Upload a Plugin" button. Select the compressed file containing the plugin from your local machine. Click "Upload" to upload the file to your OJS installation.
+
+5. Install the Plugin. Once the file has been uploaded, click on the "Install" button next to the plugin. OJS will automatically extract the contents of the compressed file and install the plugin.
+
 
 ### Example YAML
 ``` yaml
