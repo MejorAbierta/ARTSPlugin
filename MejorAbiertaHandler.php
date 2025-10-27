@@ -45,6 +45,7 @@ class MejorAbiertaHandler extends APIHandler
                 [
                     Role::ROLE_ID_MANAGER,
                     Role::ROLE_ID_SITE_ADMIN,
+
                 ],
                 [
                     'author',
@@ -757,6 +758,7 @@ class MejorAbiertaHandler extends APIHandler
 
     function urls($args, $request, $fromyaml = null)
     {
+
         $router = $request->getRouter();
         $dispatcher = $router->getDispatcher();
         $data = [];
@@ -766,6 +768,17 @@ class MejorAbiertaHandler extends APIHandler
         $data["about"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about');
         $data["privacy"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about', 'privacy');
         $data["contact"] = $dispatcher->url($request, ROUTE_PAGE, null, 'about', 'contact');
+
+        $data["igualdad"] = $dispatcher->url($request, ROUTE_PAGE, null, 'igualdad%20');
+        $data["conservacion"] = $dispatcher->url($request, ROUTE_PAGE, null, 'archivo');
+        $data["preservacion"] = $dispatcher->url($request, ROUTE_PAGE, null, 'preservacion');
+        $data["estadisticas"] = $dispatcher->url($request, ROUTE_PAGE, null, 'estadisticas');
+        $data["codigo_etico"] = $dispatcher->url($request, ROUTE_PAGE, null, 'codigo_etico%20');
+        $data["financiacion"] = $dispatcher->url($request, ROUTE_PAGE, null, 'fuentes_de_financiacion');
+        $data["autoria"] = $dispatcher->url($request, ROUTE_PAGE, null, '_Autoria');
+        $data["politicas"] = $dispatcher->url($request, ROUTE_PAGE, null, 'politicas');
+        $data["codigo_etico"] = $dispatcher->url($request, ROUTE_PAGE, null, 'codigo_etico%20');
+
 
         if ($fromyaml == null) {
             header('content-type: text/json');
@@ -808,7 +821,7 @@ class MejorAbiertaHandler extends APIHandler
 
         foreach ($ids as $id) {
             $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
-            $data[] = $reviewAssignmentDao->getBySubmissionId($id);
+            $data[] = $reviewAssignmentDao->getBySubmissionId($id[0]);
         }
 
         if ($fromyaml == null) {
@@ -826,11 +839,35 @@ class MejorAbiertaHandler extends APIHandler
             return;
         }
 
-        $submissionId = $args[0];
+
+        $contextId = Application::CONTEXT_JOURNAL;
+        $data = Repo::submission()
+            ->getCollector()
+            ->filterByContextIds([$contextId]);
+
+        if (is_string($args)) {
+            $this->initFilter($args, $data);
+        } else if (isset($args[0])) {
+            $ids = [$args[0]];
+        }
+
+        $data = $data->getMany();
+
+        if (count($this->customfilters) > 0) {
+            foreach ($this->customfilters as $key => $value) {
+                $data = $this->filterBy($data, $value[0], $value[1]);
+            }
+            $this->customfilters = [];
+        }
+
+        $ids = [];
+        foreach ($data as $obj) {
+            $ids[] = $obj['_data']['id'];
+        }  
 
         $data = Repo::eventLog()
             ->getCollector()
-            ->filterByAssoc(Application::ASSOC_TYPE_SUBMISSION, [$submissionId])
+            ->filterByAssoc(Application::ASSOC_TYPE_SUBMISSION, $ids)
             ->getMany();
 
         if ($fromyaml == null) {

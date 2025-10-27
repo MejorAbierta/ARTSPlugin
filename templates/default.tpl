@@ -15,45 +15,50 @@
 		}
 	</style>
 
+	{function name="showArray" data=[]}
+		{if $data|@count > 0}
+			<ul>
+				{foreach from=$data item=row key=key}
+					
+					{* is array *}
+					{if substr(var_export($row, true), 0, 5) === 'array'}
+						{call name="showArray" data=$row}
+					{else}
+						
+
+						{if $key=="published"}
+							<dd>
+								{if $row == 1}
+									STATUS_QUEUED
+								{else if $row == 3}
+									STATUS_PUBLISHED
+								{else if $row == 4}
+									STATUS_DECLINED
+								{else if $row == 5}
+									STATUS_SCHEDULED
+								{/if}
+							<dd>
+						{else}
+							{$key}
+							<li>{$row}</li>
+						{/if}
+					{/if}
+
+				{/foreach}
+			</ul>
+		{else}
+			<em>No data</em>
+		{/if}
+	{/function}
+
+	{call name="showArray" data=$data}
 
 	{if $data|@count > 0}
-		{foreach from=$data item=item key=key name=name}
-
-			{foreach from=$item item=subitem key=subkey name=subname}
-
-				{foreach from=$subitem item=subsubitem key=subsubkey name=subsubname}
-					{if $subsubitem}
-					<b>
-						<dt>{$subsubkey}</dt>
-					</b>
-
-					{if $subsubkey=="published"}
-						<dd>
-							{if $subsubitem == 1}
-								STATUS_QUEUED
-							{else if $subsubitem == 3}
-								STATUS_PUBLISHED
-							{else if $subsubitem == 4}
-								STATUS_DECLINED
-							{else if $subsubitem == 5}
-								STATUS_SCHEDULED
-							{/if}
-						<dd>
-						{else}
-						<dd>{$subsubitem}</dd>
-					{/if}
-				{/if}
-				{/foreach}
-
-				
-			{/foreach}
-		{/foreach}
-
+		
 		<h4>JSON</h4>
 		<code>
 			<div>{$data|json_encode|escape:'html'|replace:",":", "}</div>
 		</code>
-
 
 	{/if}
 
