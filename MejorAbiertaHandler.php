@@ -802,8 +802,7 @@ class MejorAbiertaHandler extends APIHandler
         $data = [];
 
         foreach ($ids as $id) {
-            $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
-            $data[] = $reviewAssignmentDao->getBySubmissionId($id);
+            $data[] = Repo::reviewAssignment()->get($id);
         }
 
         if ($fromyaml == null) {
@@ -898,14 +897,9 @@ class MejorAbiertaHandler extends APIHandler
 
         if (is_string($data)) {
             return $data;
-        }/*
-        if (get_class($data) != 'Illuminate\Support\LazyCollection') {
-            $data = collect([$data]);
-        }*/
+        }
+        
         $result = [];
-
-
-
 
         foreach ($data as $key => $item) {
             $item = (array) $item;
@@ -981,7 +975,7 @@ class MejorAbiertaHandler extends APIHandler
             if (isset($data['output']['operation'])) {
                 if ($data['output']['operation'] == 'count' && is_array($filtered)) {
                     $filtered[$data['output']['operation']] = count($filtered);
-                }
+                } 
             }
             if ($filtered != "No data") {
 
