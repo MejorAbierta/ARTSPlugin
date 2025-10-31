@@ -38,7 +38,7 @@ class MejorAbiertaReportForm extends Form
 
     public function display($request = null, $template = null, $args = null)
     {
-    
+
         $templateManager = TemplateManager::getManager();
 
         $templateManager->assign('operations', [
@@ -60,18 +60,28 @@ class MejorAbiertaReportForm extends Form
             'eventlogs',
             'user'
         ]);
-
-        $folderPath = dirname(__FILE__, 1) . '/configs/';
-        $files = scandir($folderPath);
-        $filesnames = [];
-        foreach ($files as $file) {
-            if (is_file($folderPath . '/' . $file)) {
-                $filesnames[] = str_replace('.yaml', '', $file);
+        try {
+            $folderPath = dirname(__FILE__, 1) . '/configs/';
+            $files = scandir($folderPath);
+            $filesnames = [];
+            foreach ($files as $file) {
+                if (is_file($folderPath . '/' . $file)) {
+                    $filesnames[] = str_replace('.yaml', '', $file);
+                }
             }
+            $templateManager->assign('filesnames', $filesnames);
+        } catch (\Throwable $th) {
+            error_log("BENJI: ".$th->getMessage());
         }
-        $templateManager->assign('filesnames', $filesnames);
 
-        $contextId = Application::CONTEXT_JOURNAL;
+
+        $context = Application::get()
+            ->getRequest()
+            ->getContext();
+
+
+        $contextId =  $context->getId();
+
         $contextDao = Application::getContextDAO();
         $contextName = $contextDao->getById($contextId)->getName()["en"];
 
@@ -90,13 +100,12 @@ class MejorAbiertaReportForm extends Form
 
         $templateManager->assign('operationsheader', [
             'count',
-            
+
         ]);
 
         $templateManager->assign('application', $this->application);
-     
+
 
         $templateManager->display($this->plugin->getTemplateResource($template));
     }
-  
 }
