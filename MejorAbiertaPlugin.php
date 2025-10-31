@@ -35,7 +35,6 @@ class MejorAbiertaPlugin extends GenericPlugin
 
            
             Hook::add('LoadHandler', array($this, 'callbackHandleContent'));
-            Hook::add('APIHandler::endpoints', [$this, 'addEndpoints']);
         }
         return $success;
     }
@@ -69,29 +68,5 @@ class MejorAbiertaPlugin extends GenericPlugin
     public function getDescription()
     {
         return "Mejor Abierta Api";
-    }
-
-    public function addEndpoints($hookName, $args)
-    {
-        $endpoints = &$args[0];
-        $apiHandler = $args[1];
-/*
-        array_unshift(
-            $endpoints['GET'],
-            [
-                'pattern' => '/{contextPath}/api/{version}/many',
-                'handler' => [$this, 'getMany'],
-                //'roles' => [],
-            ]
-        );*/
-
-        echo "addEndpoints</br>";
-    }
-
-    public function getMany(SlimRequest $slimRequest, APIResponse $response, array $args): APIResponse
-    {
-        $params = $slimRequest->getQueryParams();
-        echo "getMany";
-        return $response->withJson("buenas", 200);
     }
 }

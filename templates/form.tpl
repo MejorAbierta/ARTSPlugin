@@ -4,7 +4,7 @@
 	<h1>{translate key='plugins.generic.mejorAbierta.displayName'}</h1>
 	Current configuration files:
 	<ul>
-
+		
 		{foreach from=$filesnames item=item key=key name=name}
 
 			<li><a href="{$baseURL}{$item}"> {$item}</a></li>
@@ -12,14 +12,15 @@
 		{/foreach}
 	</ul>
 	Create new yaml configuration file:
+	
 	</br>
 	</br>
 	<button id="addButton" class="pkp_button"> {translate key='plugins.generic.mejorAbierta.add'}</button>
 	</br>
 	</br>
+
 	<form class="pkp_form" id="openIDSettings" method="POST" enctype="multipart/form-data">
-		{csrf}
-		{fbvFormArea}
+	
 
 		{fbvElement readonly="on" type="textarea" id="textyaml" maxlength="250" inline=true size=$fbvStyles.size.MEDIUM}
 		{fbvElement placeholder="plugins.generic.mejorAbierta.file" type="text" id="titlefile" }
@@ -27,9 +28,8 @@
 		<input class="pkp_button submitFormButton" type="submit"
 			value="{translate key="plugins.generic.mejorAbierta.accept"}" class="button defaultButton" />
 
-		{/fbvFormArea}
 	</form>
-
+	
 	<style>
 		.macenter {
 			border: 1px solid #ccc;

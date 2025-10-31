@@ -18,30 +18,16 @@
 	{function name="showArray" data=[]}
 		{if $data|@count > 0}
 			<ul>
-				{foreach from=$data item=row key=key}
+				{foreach from=$data item=$row key=$key}
 					
 					{* is array *}
-					{if substr(var_export($row, true), 0, 5) === 'array'}
+					{if is_array($row) || is_object($row)}
 						{call name="showArray" data=$row}
 					{else}
-						
-
-						{if $key=="published"}
-							<dd>
-								{if $row == 1}
-									STATUS_QUEUED
-								{else if $row == 3}
-									STATUS_PUBLISHED
-								{else if $row == 4}
-									STATUS_DECLINED
-								{else if $row == 5}
-									STATUS_SCHEDULED
-								{/if}
-							<dd>
-						{else}
+							
 							{$key}
-							<li>{$row}</li>
-						{/if}
+							
+							{$row}
 					{/if}
 
 				{/foreach}

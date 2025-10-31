@@ -81,7 +81,7 @@ class MejorAbiertaHandler extends APIHandler
 
         if (isset($headers['Authorization'])) {
             if ($headers['Authorization'] != "Bearer $api_token") {
-                return $request->getDispatcher()->handle404();
+                return "403";
             }
         } else {
             $this->addPolicy(new ContextAccessPolicy($request, $roleAssignments));
@@ -109,32 +109,14 @@ class MejorAbiertaHandler extends APIHandler
     }
 
 
-    /*
-
-	function authorize($request, &$args, $roleAssignments) {
-		$this->addPolicy(new ContextAccessPolicy($request, $roleAssignments));
-		return parent::authorize($request, $args, $roleAssignments);
-	}
-*//*
-    public function authorize($request, &$args, $roleAssignments)
+    function getJournalId()
     {
-        $apiKey = $_SERVER['Authorization'];
-        echo $apiKey;
-        if ($apiKey) {
-            // Para API Key, solo verificamos que la key sea válida
-            $this->addPolicy(new ApiKeyAuthorizationPolicy($request, null, $apiKey));
-        } else {
-            // Para acceso normal, verificamos roles de usuario
-            $this->addPolicy(new UserRolesRequiredPolicy($request), true);
+        $context = Application::get()
+            ->getRequest()
+            ->getContext();
 
-            $rolePolicy = new PolicySet(PolicySet::COMBINING_PERMIT_OVERRIDES);
-            foreach ($roleAssignments as $role => $operations) {
-                $rolePolicy->addPolicy(new RoleBasedHandlerOperationPolicy($request, $role, $operations));
-            }
-            $this->addPolicy($rolePolicy);
-        }
-        return parent::authorize($request, $args, $roleAssignments);
-    }*/
+        return $context->getId();
+    }
 
     public function announcement($args, $request, $fromyaml = null)
     {
@@ -221,7 +203,7 @@ class MejorAbiertaHandler extends APIHandler
     public function institution($args, $request, $fromyaml = null)
     {
 
-        $contextId = Application::CONTEXT_JOURNAL;
+        $contextId = $this->getJournalId();
         $data = Repo::institution()
             ->getCollector()
             ->filterByContextIds([$contextId]);
@@ -328,7 +310,7 @@ class MejorAbiertaHandler extends APIHandler
 
     function representation()
     {
-        $contextId = Application::CONTEXT_JOURNAL;
+        $contextId = $this->getJournalId();
         /** @var ContextDAO $contextDao */
         $representationDAO = Application::getRepresentationDAO();
         /** @var Context $context */
@@ -369,7 +351,7 @@ class MejorAbiertaHandler extends APIHandler
 
     function journalIdentity($args, $request, $fromyaml = null)
     {
-        $contextId = Application::CONTEXT_JOURNAL;
+        $contextId = $this->getJournalId();
         /** @var ContextDAO $contextDao */
         $contextDao = Application::getContextDAO();
         /** @var Context $context */
@@ -381,11 +363,11 @@ class MejorAbiertaHandler extends APIHandler
         $text .= "ISSN: " . $context->getSetting('printIssn') . "|";
         $text .= "ISSN electrónico: " . $context->getSetting('onlineIssn') . "|";
         $text .= "Entidad: " . $context->getSetting('publisherInstitution');
-        */
+        *//*
         $context->printIssn = $context->getSetting('printIssn');
         $context->onlineIssn = $context->getSetting('onlineIssn');
         $context->publisherInstitution = $context->getSetting('publisherInstitution');
-
+*/
         if (is_string($args)) {
             $this->initFilter($args, $context);
         }
@@ -418,9 +400,7 @@ class MejorAbiertaHandler extends APIHandler
     function about($args, $request, $fromyaml = null)
     {
 
-
-
-        $contextId = Application::CONTEXT_JOURNAL;
+        $contextId = $this->getJournalId();
         /** @var ContextDAO $contextDao */
         $contextDao = Application::getContextDAO();
         /** @var Context $context */
@@ -445,7 +425,9 @@ class MejorAbiertaHandler extends APIHandler
     function submissions($args, $request, $fromyaml = null)
     {
 
-        $contextId = Application::CONTEXT_JOURNAL;
+
+
+        $contextId = $this->getJournalId();
         $data = Repo::submission()
             ->getCollector()
             ->filterByContextIds([$contextId]);
@@ -698,7 +680,7 @@ class MejorAbiertaHandler extends APIHandler
     function issues($args, $request, $fromyaml = null)
     {
 
-        $contextId = Application::CONTEXT_JOURNAL;
+        $contextId = $this->getJournalId();
         $data = Repo::issue()
             ->getCollector()
             ->filterByContextIds([$contextId]);
@@ -738,7 +720,7 @@ class MejorAbiertaHandler extends APIHandler
 
     function section($args, $request, $fromyaml = null)
     {
-        $contextId = Application::CONTEXT_JOURNAL;
+        $contextId = $this->getJournalId();
         $data = Repo::section()
             ->getCollector()
             ->filterByContextIds([$contextId]);
@@ -792,7 +774,7 @@ class MejorAbiertaHandler extends APIHandler
     {
 
 
-        $contextId = Application::CONTEXT_JOURNAL;
+        $contextId = $this->getJournalId();
         $data = Repo::submission()
             ->getCollector()
             ->filterByContextIds([$contextId]);
@@ -820,8 +802,7 @@ class MejorAbiertaHandler extends APIHandler
         $data = [];
 
         foreach ($ids as $id) {
-            $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
-            $data[] = $reviewAssignmentDao->getBySubmissionId($id[0]);
+            $data[] = Repo::reviewAssignment()->get($id);
         }
 
         if ($fromyaml == null) {
@@ -840,7 +821,7 @@ class MejorAbiertaHandler extends APIHandler
         }
 
 
-        $contextId = Application::CONTEXT_JOURNAL;
+        $contextId = $this->getJournalId();
         $data = Repo::submission()
             ->getCollector()
             ->filterByContextIds([$contextId]);
@@ -863,7 +844,7 @@ class MejorAbiertaHandler extends APIHandler
         $ids = [];
         foreach ($data as $obj) {
             $ids[] = $obj['_data']['id'];
-        }  
+        }
 
         $data = Repo::eventLog()
             ->getCollector()
@@ -916,14 +897,9 @@ class MejorAbiertaHandler extends APIHandler
 
         if (is_string($data)) {
             return $data;
-        }/*
-        if (get_class($data) != 'Illuminate\Support\LazyCollection') {
-            $data = collect([$data]);
-        }*/
+        }
+        
         $result = [];
-
-
-
 
         foreach ($data as $key => $item) {
             $item = (array) $item;
@@ -972,9 +948,13 @@ class MejorAbiertaHandler extends APIHandler
 
 
         foreach ($yaml['report']['data'] as $data) {
-            $fields = explode(",", $data['output']['fields']);
-            if (count($fields) == 0) {
-                $fields = [$data['output']['fields']];
+            if ($data['output']['fields'] == null) {
+                $fields = [];
+            } else {
+                $fields = explode(",", $data['output']['fields']);
+                if (count($fields) == 0) {
+                    $fields = [$data['output']['fields']];
+                }
             }
 
             $this->customfilters = [];
@@ -986,13 +966,16 @@ class MejorAbiertaHandler extends APIHandler
                     $output = $this->filterBy($output, $value[0], $value[1]);
                 }
             }
-
-            $filtered = $this->filterFileds($output, $fields);
+            if (count($fields) > 0) {
+                $filtered = $this->filterFileds($output, $fields);
+            } else {
+                $filtered = json_decode(json_encode($output), true);
+            }
 
             if (isset($data['output']['operation'])) {
-                if ($data['output']['operation'] == 'count') {
-                    $filtered[$data['output']['operation']] = count($output);
-                }
+                if ($data['output']['operation'] == 'count' && is_array($filtered)) {
+                    $filtered[$data['output']['operation']] = count($filtered);
+                } 
             }
             if ($filtered != "No data") {
 
