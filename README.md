@@ -17,6 +17,10 @@
 
 5. Install the Plugin. Once the file has been uploaded, click on the "Install" button next to the plugin. OJS will automatically extract the contents of the compressed file and install the plugin.
 
+6. Visit your list of plugins and enable the ARTS plugin.
+
+7. Click on the "config" icon of the plugin or visit directly the entrypoint /ARTS
+
 
 ### Example YAML
 ``` yaml
