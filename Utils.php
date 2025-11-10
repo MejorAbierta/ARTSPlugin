@@ -96,3 +96,35 @@ function download_csvs($files, $filename)
     readfile('csvs.zip');
     unlink('csvs.zip');
 }
+
+
+function isPureSelect(string $sql): bool
+{
+    $trimmed = trim($sql);
+
+    if (!preg_match('/^SELECT\s/i', $trimmed)) {
+        return false;
+    }
+
+    $forbidden = [
+        'INSERT', 'UPDATE', 'DELETE', 'REPLACE',
+        'CREATE', 'DROP', 'ALTER', 'TRUNCATE',
+        'GRANT', 'REVOKE', 'SET', 'EXEC', 'CALL',
+        'MERGE', 'UPSERT', 'LOCK', 'UNLOCK',
+        'BEGIN', 'COMMIT', 'ROLLBACK'
+    ];
+
+    $pattern = '/\b(' . implode('|', $forbidden) . ')\b/i';
+    if (preg_match($pattern, $trimmed)) {
+        return false;
+    }
+
+    if (strpos($trimmed, ';') !== false) {
+        $parts = array_filter(explode(';', $trimmed), 'strlen');
+        if (count($parts) > 1) {
+            return false;
+        }
+    }
+
+    return true;
+}
