@@ -17,6 +17,10 @@
 
 5. Install the Plugin. Once the file has been uploaded, click on the "Install" button next to the plugin. OJS will automatically extract the contents of the compressed file and install the plugin.
 
+6. Visit your list of plugins and enable the ARTS plugin.
+
+7. Click on the "config" icon of the plugin or visit directly the entrypoint /ARTS
+
 
 ### Example YAML
 ``` yaml
@@ -38,34 +42,83 @@ report:
 ```
 
 ### Available api methods
-
 announcement($args, $request)
 
     Retrieves announcement data
 
-author($args, $request)
+#### author
 
-    Retrieves author data
+  Retrieves author data
+  - id
+  - givenName
+  - familyName
+  - email
+  - publicationId
+  - userGroupId
+  - country
+  - affiliation
 
-category($args, $request)
+#### category
 
-    Retrieves category data
+  Retrieves category data
+  - id
+  - title
+  - description
+  - parentId
+  - contextId
+  - sequence
+  - path
+  - image
+  - sortOption
 
-decision($args, $request)
+#### decision
 
-    Retrieves decision data
+  Retrieves decision data
+  - id
+  - dateDecided
+  - decision
+  - editorId
+  - reviewRoundId
+  - round
+  - stageId
+  - submissionId
 
 institution($args, $request)
 
     Retrieves institution data
 
-submissionFile($args, $request)
+#### submissionFile
 
-    Handles submission files and allows compressed downloads
-
+  Return submission file data
+  - assocId
+  - assocType
+  - createdAt
+  - fileId
+  - fileStage
+  - genreId
+  - sourceSubmissionFileId
+  - submissionId
+  - updatedAt
+  - uploaderUserId
+  - viewable
+  - dateCreated
+  - language
+  - name
+  - locale
+  - path
+  - mimetype
+ 
 representation()
 
-    Retrieves representation data
+  Retrieves representation data
+  - submissionFileId
+  - isApproved
+  - locale
+  - label
+  - publicationId
+  - urlPath
+  - urlRemote
+  - doiId
 
 reviewers($args, $request)
 
@@ -73,7 +126,71 @@ reviewers($args, $request)
 
 journalIdentity()
 
-    Retrieves journal identity information
+  Retrieves journal identity information
+  - id
+  - urlPath
+  - enabled
+  - primaryLocale
+  - currentIssueId
+  - acronym
+  - authorGuidelines
+  - authorInformation
+  - beginSubmissionHelp
+  - contactEmail
+  - contactName
+  - contributorsHelp
+  - copySubmissionAckPrimaryContact
+  - copySubmissionAckAddress
+  - emailSignature
+  - enableDois
+  - doiSuffixType
+  - registrationAgency
+  - disableSubmissions
+  - editorialStatsEmail
+  - forTheEditorsHelp
+  - itemsPerPage
+  - keywords
+  - librarianInformation
+  - name
+  - notifyAllAuthors
+  - numPageLinks
+  - numWeeksPerResponse
+  - numWeeksPerReview
+  - openAccessPolicy
+  - privacyStatement
+  - readerInformation
+  - reviewHelp
+  - submissionAcknowledgement
+  - submissionChecklist
+  - submitWithCategories
+  - supportedFormLocales
+  - supportedLocales
+  - supportedSubmissionLocales
+  - themePluginPath
+  - uploadFilesHelp
+  - enableGeoUsageStats
+  - enableInstitutionUsageStats
+  - isSushiApiPublic
+  - abbreviation
+  - clockssLicense
+  - copyrightYearBasis
+  - enabledDoiTypes
+  - doiCreationTime
+  - enableOai
+  - lockssLicense
+  - membershipFee
+  - publicationFee
+  - purchaseArticleFee
+  - doiVersioning
+  - description
+  - about
+  - editorialTeam
+  - onlineIssn
+  - printIssn
+  - publisherInstitution
+  - licenseUrl
+  - copyrightHolderType
+  - version(OJS)
 
 DAO($args, $request)
 
@@ -83,17 +200,104 @@ about($args, $request)
 
     Retrieves "about" information for the journal
 
-submissions($args, $request)
+#### submissions
 
-    Retrieves submission data
+  Retrieves submission data
+  - id
+  - contextId
+  - currentPublicationId
+  - dateLastActivity
+  - dateSubmitted
+  - lastModified
+  - locale
+  - stageId
+  - status
+  - submissionProgress
+  - publications
 
-issues($args, $request)
+  
+#### publications
 
-    Retrieves issue/volume data
+  - id
+  - accessStatus
+  - datePublished
+  - lastModified
+  - primaryContactId
+  - sectionId
+  - submissionId
+  - status
+  - urlPath
+  - version
+  - doiId
+  - categoryIds
+  - copyrightYear
+  - issueId
+  - abstract
+  - title
+  - locale
+  - authors
+  - keywords
+  - subjects
+  - disciplines
+  - languages
+  - supportingAgencies
+  - galleys
 
-section($args, $request)
+#### galleys
+  - id
+  - submissionFileId
+  - isApproved
+  - locale
+  - label
+  - publicationId
+  - urlPath
+  - urlRemote
+  - doiId
 
-    Retrieves section data
+#### issues
+
+  Retrieves issue/volume data
+  - id
+  - journalId
+  - volume
+  - number
+  - year
+  - published
+  - datePublished
+  - dateNotified
+  - lastModified
+  - accessStatus
+  - openAccessDate
+  - showVolume
+  - showNumber
+  - showYear
+  - showTitle
+  - styleFileName
+  - originalStyleFileName
+  - urlPath
+  - doiId
+  - description
+  - title
+
+
+#### section
+
+  Retrieves section data
+  - id
+  - contextId
+  - reviewFormId
+  - sequence
+  - editorRestricted
+  - metaIndexed
+  - metaReviewed
+  - abstractsNotRequired
+  - hideTitle
+  - hideAuthor
+  - isInactive
+  - wordCount
+  - abbrev
+  - policy
+  - title
 
 urls($args, $request)
 

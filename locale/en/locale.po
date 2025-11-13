@@ -12,10 +12,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "plugins.generic.mejorAbierta.displayName"
-msgstr "Plugin API mejorAbierta"
+msgstr "Plugin Advanced Report Tool Suite - ARTS"
 
 msgid "plugins.generic.mejorAbierta.description"
-msgstr "mejorAbierta API ."
+msgstr "Advanced Report Tool Suite - ARTS"
 
 msgid "plugins.generic.mejorAbierta.title"
 msgstr "Title"
