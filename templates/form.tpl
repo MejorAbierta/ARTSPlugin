@@ -1,7 +1,7 @@
-{include file="frontend/components/header.tpl" pageTitle='plugins.generic.mejorAbierta.description'}
+{include file="frontend/components/header.tpl" pageTitle='plugins.generic.arts.description'}
 <div class="page">
-	{include file="frontend/components/breadcrumbs.tpl" currentTitleKey='plugins.generic.mejorAbierta.description'}
-	<h1>{translate key='plugins.generic.mejorAbierta.displayName'}</h1>
+	{include file="frontend/components/breadcrumbs.tpl" currentTitleKey='plugins.generic.arts.description'}
+	<h1>{translate key='plugins.generic.arts.displayName'}</h1>
 	Current configuration files:
 	<ul>
 		
@@ -15,7 +15,7 @@
 	
 	</br>
 	</br>
-	<button id="addButton" class="pkp_button"> {translate key='plugins.generic.mejorAbierta.add'}</button>
+	<button id="addButton" class="pkp_button"> {translate key='plugins.generic.arts.add'}</button>
 	</br>
 	</br>
 
@@ -23,10 +23,10 @@
 	
 
 		{fbvElement readonly="on" type="textarea" id="textyaml" maxlength="250" inline=true size=$fbvStyles.size.MEDIUM}
-		{fbvElement placeholder="plugins.generic.mejorAbierta.file" type="text" id="titlefile" }
+		{fbvElement placeholder="plugins.generic.arts.file" type="text" id="titlefile" }
 
 		<input class="pkp_button submitFormButton" type="submit"
-			value="{translate key="plugins.generic.mejorAbierta.accept"}" class="button defaultButton" />
+			value="{translate key="plugins.generic.arts.accept"}" class="button defaultButton" />
 
 	</form>
 	
@@ -61,18 +61,18 @@
 				:aria-hidden="true">×</span><span class="pkp_screen_reader">Close Panel</span></div>
 
 		<fieldset class="search_advanced">
-			<legend><b>{translate key='plugins.generic.mejorAbierta.add'}</b></legend>
+			<legend><b>{translate key='plugins.generic.arts.add'}</b></legend>
 
 			<div class="ma">
 
 				</br>
 				</br>
 
-				{translate key='plugins.generic.mejorAbierta.operation'}
+				{translate key='plugins.generic.arts.operation'}
 				<section>
 
 					<select id="operation" class="styled-select dropdown">
-						<option value=""> -- {translate key='plugins.generic.mejorAbierta.operation'} --</option>
+						<option value=""> -- {translate key='plugins.generic.arts.operation'} --</option>
 						{foreach from=$operations item=operation key=name}
 
 							<option value="{$operation}">{$operation}</option>
@@ -81,17 +81,17 @@
 					</select>
 				</section>
 				</br>
-				{translate key='plugins.generic.mejorAbierta.filter'}
+				{translate key='plugins.generic.arts.filter'}
 				</br>
 				<textarea class="field text textyaml" id="params"></textarea>
 				</br>
 				</br>
-				{translate key='plugins.generic.mejorAbierta.fields'}
+				{translate key='plugins.generic.arts.fields'}
 				</br>
 				<textarea class="field text textyaml" id="fields"></textarea>
 				</br>
 				</br>
-				{translate key='plugins.generic.mejorAbierta.description'}
+				{translate key='plugins.generic.arts.description'}
 				</br>
 				<textarea class="field text textyaml" id="title" ></textarea>
 
@@ -108,7 +108,7 @@
 				</p>
 				</br>
 			</div>
-			<button id="addConfigButton" class="pkp_button"> {translate key='plugins.generic.mejorAbierta.add'}</button>
+			<button id="addConfigButton" class="pkp_button"> {translate key='plugins.generic.arts.add'}</button>
 
 		</fieldset>
 
@@ -121,19 +121,19 @@
 				:aria-hidden="true">×</span><span class="pkp_screen_reader">Close Panel</span></div>
 
 		<fieldset class="search_advanced">
-			<legend><b>{translate key='plugins.generic.mejorAbierta.add'}</b></legend>
+			<legend><b>{translate key='plugins.generic.arts.add'}</b></legend>
 
 			<div class="ma">
-				{translate key='plugins.generic.mejorAbierta.title'}
+				{translate key='plugins.generic.arts.title'}
 				<input class="field text" type="text" id="name" />
 				</br>
 				</br>
 
-				{translate key='plugins.generic.mejorAbierta.auth'}
+				{translate key='plugins.generic.arts.auth'}
 				<section>
 
 					<select id="auth" class="styled-select dropdown">
-						<option value=""> -- {translate key='plugins.generic.mejorAbierta.auth'} --</option>
+						<option value=""> -- {translate key='plugins.generic.arts.auth'} --</option>
 						{foreach from=$auths item=auth key=name}
 
 							<option value="{$auth}">{$auth}</option>
@@ -143,11 +143,11 @@
 				</section>
 				</br>
 				</br>
-				{translate key='plugins.generic.mejorAbierta.format'}
+				{translate key='plugins.generic.arts.format'}
 				<section>
 
 					<select id="format" class="styled-select dropdown">
-						<option value=""> -- {translate key='plugins.generic.mejorAbierta.format'} --</option>
+						<option value=""> -- {translate key='plugins.generic.arts.format'} --</option>
 						{foreach from=$formats item=format key=name}
 
 							<option value="{$format}">{$format}</option>
@@ -158,11 +158,11 @@
 				</br>
 				</br>
 
-				{translate key='plugins.generic.mejorAbierta.operation'}
+				{translate key='plugins.generic.arts.operation'}
 				<section>
 
 					<select id="operationheader" class="styled-select dropdown">
-						<option value=""> -- {translate key='plugins.generic.mejorAbierta.operation'} --</option>
+						<option value=""> -- {translate key='plugins.generic.arts.operation'} --</option>
 						{foreach from=$operationsheader item=operationheader key=name}
 
 							<option value="{$operationheader}">{$operationheader}</option>
@@ -174,7 +174,7 @@
 				</br>
 
 			</div>
-			<button id="addHeaderButton" class="pkp_button"> {translate key='plugins.generic.mejorAbierta.add'}</button>
+			<button id="addHeaderButton" class="pkp_button"> {translate key='plugins.generic.arts.add'}</button>
 
 		</fieldset>
 

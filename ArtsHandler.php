@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\generic\mejorAbierta;
+namespace APP\plugins\generic\arts;
 
 use PKP\handler\APIHandler;
 
@@ -15,7 +15,7 @@ use APP\core\Application;
 
 require_once __DIR__ . '/Utils.php';
 
-class MejorAbiertaHandler extends APIHandler
+class ArtsHandler extends APIHandler
 {
     var $bannedFields = [
         'password',
@@ -36,7 +36,7 @@ class MejorAbiertaHandler extends APIHandler
         $this->plugin = $plugin;
 
         //PKPSiteAccessPolicy::SITE_ACCESS_ALL_ROLES
-        $this->_handlerPath = 'mejorAbierta';
+        $this->_handlerPath = 'ARTS';
 
         $headers = getallheaders();
         if (!isset($headers['Authorization'])) {
@@ -1139,7 +1139,7 @@ class MejorAbiertaHandler extends APIHandler
                 download_csvs($values, $simpleName);
                 break;
             case 'html':
-                $form = new MejorAbiertaReportTemplate($this->plugin, $yaml['report']['config']['template']);
+                $form = new ArtsReportTemplate($this->plugin, $yaml['report']['config']['template']);
                 $form->initData();
                 if ($request->isPost($request)) {
                 } else {
@@ -1186,7 +1186,7 @@ class MejorAbiertaHandler extends APIHandler
     function report($args, $request)
     {
 
-        $form = new MejorAbiertaReportForm($this->plugin);
+        $form = new ArtsReportForm($this->plugin);
         $form->initData();
         if ($request->isPost($request)) {
             $reportParams = $request->getUserVars();

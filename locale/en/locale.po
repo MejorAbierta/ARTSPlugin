@@ -11,41 +11,41 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "plugins.generic.mejorAbierta.displayName"
+msgid "plugins.generic.arts.displayName"
 msgstr "Plugin Advanced Report Tool Suite - ARTS"
 
-msgid "plugins.generic.mejorAbierta.description"
+msgid "plugins.generic.arts.description"
 msgstr "Advanced Report Tool Suite - ARTS"
 
-msgid "plugins.generic.mejorAbierta.title"
+msgid "plugins.generic.arts.title"
 msgstr "Title"
 
-msgid "plugins.generic.mejorAbierta.operation"
+msgid "plugins.generic.arts.operation"
 msgstr "Operation"
 
-msgid "plugins.generic.mejorAbierta.add"
+msgid "plugins.generic.arts.add"
 msgstr "Add data"
 
-msgid "plugins.generic.mejorAbierta.params"
+msgid "plugins.generic.arts.params"
 msgstr "Params"
 
-msgid "plugins.generic.mejorAbierta.filter"
+msgid "plugins.generic.arts.filter"
 msgstr "Filter"
 
-msgid "plugins.generic.mejorAbierta.fields"
+msgid "plugins.generic.arts.fields"
 msgstr "Fields"
 
-msgid "plugins.generic.mejorAbierta.description"
+msgid "plugins.generic.arts.description"
 msgstr "Description"
 
-msgid "plugins.generic.mejorAbierta.format"
+msgid "plugins.generic.arts.format"
 msgstr "format"
 
-msgid "plugins.generic.mejorAbierta.auth"
+msgid "plugins.generic.arts.auth"
 msgstr "Authorization"
 
-msgid "plugins.generic.mejorAbierta.accept"
+msgid "plugins.generic.arts.accept"
 msgstr "Accept"
 
-msgid "plugins.generic.mejorAbierta.file"
+msgid "plugins.generic.arts.file"
 msgstr "Title File"

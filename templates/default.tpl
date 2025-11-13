@@ -1,6 +1,6 @@
-{include file="frontend/components/header.tpl" pageTitle='plugins.generic.mejorAbierta.description'}
+{include file="frontend/components/header.tpl" pageTitle='plugins.generic.arts.description'}
 <div class="page">
-	{include file="frontend/components/breadcrumbs.tpl" currentTitleKey='plugins.generic.mejorAbierta.description'}
+	{include file="frontend/components/breadcrumbs.tpl" currentTitleKey='plugins.generic.arts.description'}
 
 
 	<style>
