@@ -1,7 +1,7 @@
-{include file="frontend/components/header.tpl" pageTitle='plugins.generic.mejorAbierta.description'}
+{include file="frontend/components/header.tpl" pageTitle='plugins.generic.arts.description'}
 <div class="page">
-	{include file="frontend/components/breadcrumbs.tpl" currentTitleKey='plugins.generic.mejorAbierta.description'}
-	<h1>{translate key='plugins.generic.mejorAbierta.displayName'}</h1>
+	{include file="frontend/components/breadcrumbs.tpl" currentTitleKey='plugins.generic.arts.description'}
+	<h1>{translate key='plugins.generic.arts.displayName'}</h1>
 	Current configuration files:
 	<ul>
 		

@@ -1,5 +1,5 @@
 <?php
-namespace APP\plugins\generic\mejorAbierta;
+namespace APP\plugins\generic\arts;
 
 use APP\core\Application;
 use APP\template\TemplateManager;
@@ -7,7 +7,7 @@ use PKP\form\Form;
 use PKP\form\validation\FormValidatorCSRF;
 use PKP\form\validation\FormValidatorPost;
 
-class MejorAbiertaReportTemplate extends Form
+class ArtsReportTemplate extends Form
 {
     /* @var int Associated context ID */
     private $contextId;

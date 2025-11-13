@@ -2,10 +2,10 @@
 <!DOCTYPE version SYSTEM "../../../lib/pkp/dtd/pluginVersion.dtd">
 
 <version>
-	<application>mejorAbierta</application>
+	<application>arts</application>
 	<type>plugins.generic</type>
-	<release>1.0.0.1</release>
-	<date>2025-10-23</date>
+	<release>1.0.0.0</release>
+	<date>2025-11-13</date>
 	<lazy-load>1</lazy-load>
-	<class>MejorAbiertaPlugin</class>
+	<class>ArtsPlugin</class>
 </version>

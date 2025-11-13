@@ -1,23 +1,15 @@
 <?php
 
-namespace APP\plugins\generic\mejorAbierta;
+namespace APP\plugins\generic\arts;
 
 
 use PKP\plugins\GenericPlugin;
 use PKP\plugins\Hook;
 use PKP\config\Config;
 
-use APP\core\Application;
-
-use APP\facades\Repo;
-
-
-use PKP\core\APIResponse;
-use Slim\Http\Request as SlimRequest;
-
 require_once(dirname(__FILE__) . '/vendor/autoload.php');
 
-class MejorAbiertaPlugin extends GenericPlugin
+class ArtsPlugin extends GenericPlugin
 {
 
     public function __construct()
@@ -45,8 +37,8 @@ class MejorAbiertaPlugin extends GenericPlugin
         $op = &$args[1];
         $handler = &$args[3];
         
-        if ($page == 'mejorAbierta') {
-            $handler = new MejorAbiertaHandler($this);
+        if ($page == 'ARTS') {
+            $handler = new ArtsHandler($this);
             return true;
         }
 
@@ -59,7 +51,7 @@ class MejorAbiertaPlugin extends GenericPlugin
      */
     public function getDisplayName()
     {
-        return "Mejor Abierta Api";
+       return __('plugins.generic.arts.displayName');
     }
 
     /**
@@ -67,6 +59,6 @@ class MejorAbiertaPlugin extends GenericPlugin
      */
     public function getDescription()
     {
-        return "Mejor Abierta Api";
+        return __('plugins.generic.arts.displayName');
     }
 }
