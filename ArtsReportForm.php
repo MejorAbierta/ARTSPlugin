@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\generic\mejorAbierta;
+namespace APP\plugins\generic\arts;
 
 use APP\core\Application;
 use APP\template\TemplateManager;
@@ -8,7 +8,7 @@ use PKP\form\Form;
 use PKP\form\validation\FormValidatorCSRF;
 use PKP\form\validation\FormValidatorPost;
 
-class MejorAbiertaReportForm extends Form
+class ArtsReportForm extends Form
 {
     /* @var int Associated context ID */
     private $contextId;
@@ -86,7 +86,7 @@ class MejorAbiertaReportForm extends Form
         $contextName = $contextDao->getById($contextId)->getName()["en"];
 
 
-        $templateManager->assign('baseURL', $request->getBaseUrl() . '/index.php/' . $contextName . '/mejorAbierta/parseyaml/');
+        $templateManager->assign('baseURL', $request->getBaseUrl() . '/index.php/' . $contextName . '/ARTS/parseyaml/');
         $templateManager->assign('formats', [
             'json',
             'csv',
