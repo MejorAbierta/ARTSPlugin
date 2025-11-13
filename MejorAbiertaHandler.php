@@ -9,7 +9,7 @@ use PKP\security\Role;
 use PKP\db\DAORegistry;
 use PKP\submission\PKPSubmission;
 use PKP\security\authorization\ContextAccessPolicy;
-
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\Yaml\Yaml;
 use APP\core\Application;
 
@@ -1222,37 +1222,28 @@ class MejorAbiertaHandler extends APIHandler
         } else {
             $dateStart = date('Y-01-01');
             $dateEnd = date('Y-m-d');
-            $form->display($request, 'form.tpl', [$dateStart, $dateEnd]);
+            $form->display($request, 'list.tpl', [$dateStart, $dateEnd]);
         }
     }
 
     function doQuery($args, $request, $fromyaml = null)
     {
         try {
-            $conn = new \mysqli("db", "pkp", "pkp", "pkp");
-
-            // Verificar conexión
-            if ($conn->connect_error) {
-                die("Conexión fallida: " . $conn->connect_error);
-            }
-
             $sql = $args;
 
             if (!isPureSelect($sql)) {
-                $conn->close();
                 return "OPERATION NOT PERMITED " . $sql;
             }
 
-            $result = $conn->query($sql);
-
+            $result = DB::cursor(DB::raw($sql)->getValue(DB::connection()->getQueryGrammar()), []);
+          
             if ($result) {
-                $rows = $result->fetch_all(MYSQLI_ASSOC);
+                $rows = $result->current();
                 return ($rows);
             } else {
                 return json_encode([]);
             }
 
-            $conn->close();
         } catch (\Throwable $th) {
             return $th->getMessage();
         }
