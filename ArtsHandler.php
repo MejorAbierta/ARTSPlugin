@@ -402,26 +402,9 @@ class ArtsHandler extends APIHandler
         /** @var Context $context */
         $context = $contextDao->getById($contextId);
 
-        /*
-        $text = "Datos de la revista" . "|";
-        $text .= "Nombre: " . implode(",", $context->getSetting('name')) . "|";
-        $text .= "ISSN: " . $context->getSetting('printIssn') . "|";
-        $text .= "ISSN electrónico: " . $context->getSetting('onlineIssn') . "|";
-        $text .= "Entidad: " . $context->getSetting('publisherInstitution');
-        */
 
         $contextArray = (array)$context;
-        /*
-        $context->printIssn = $context->getSetting('printIssn');
-        $context->onlineIssn = $context->getSetting('onlineIssn');
-        $context->publisherInstitution = $context->getSetting('publisherInstitution');
-        $context->licenseUrl = $context->getSetting('licenseUrl');
-     */
-        // $contextArray['doiPrefix'] = $context->getSetting('doiPrefix');
-
         $contextArray['version'] = Application::get()->getCurrentVersion()->getVersionString();
-
-
 
         if (is_string($args)) {
             $this->initFilter($args, $contextArray);
@@ -729,8 +712,6 @@ class ArtsHandler extends APIHandler
         foreach ($data as $key => $item) {
             $item = (array) $item;
 
-
-
             if (isset($item['_data'][$filtername]['en'])) {
                 if (str_contains($filtername, 'date')) {
                     if (substr(strtolower($item['_data'][$filtername]), 0, strlen($value)) == strtolower($value)) {
@@ -758,7 +739,6 @@ class ArtsHandler extends APIHandler
                 }
             }
         }
-
         return $result;
     }
 
@@ -1056,12 +1036,16 @@ class ArtsHandler extends APIHandler
                         $row[$field] = $item[$field];
                     }
                 }
-                $result[] = $row;
+                if (count($row) > 0) {
+                    $result[] = $row;
+                }
             }
         }
-
-        // $result now contains only the selected fields
-        return $result;
+        if (count($result) == 1) {
+            return $result[0];
+        } else {
+            return $result;
+        }
     }
 
 
@@ -1236,14 +1220,13 @@ class ArtsHandler extends APIHandler
             }
 
             $result = DB::cursor(DB::raw($sql)->getValue(DB::connection()->getQueryGrammar()), []);
-          
+
             if ($result) {
                 $rows = $result->current();
                 return ($rows);
             } else {
                 return json_encode([]);
             }
-
         } catch (\Throwable $th) {
             return $th->getMessage();
         }

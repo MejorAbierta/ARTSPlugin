@@ -1,6 +1,6 @@
-{include file="frontend/components/header.tpl" pageTitle='plugins.generic.arts.description'}
+{include file="frontend/components/header.tpl" pageTitle='plugins.generic.arts.name'}
 <div class="page">
-	{include file="frontend/components/breadcrumbs.tpl" currentTitleKey='plugins.generic.arts.description'}
+	{include file="frontend/components/breadcrumbs.tpl" currentTitleKey='plugins.generic.arts.name'}
 	<h1>{translate key='plugins.generic.arts.displayName'}</h1>
 	Current configuration files:
 	<ul>

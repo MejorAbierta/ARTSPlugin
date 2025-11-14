@@ -1,0 +1,188 @@
+report:
+  config:
+    id: 01
+    name: Transparencia
+    authorization: admin
+    format: html
+    template: transparencia.tpl
+
+  data:
+
+    - id: journalIdentity
+      description: 
+      operation: journalIdentity
+      params: 
+      output:
+        fields: id,name,publisherInstitution,printIssn,onlineIssn,contactName,contactEmail,description,urlPath,abbreviation,
+
+    - id: journalPreferences
+      description: 
+      operation: journalIdentity
+      params: 
+      output:
+        fields: openAccessPolicy,copyrightHolderType,copyrightYearBasis,version,supportedLocales,supportedSubmissionLocales
+      
+    - id: category
+      description: 
+      operation: category
+      params: 
+      output:
+        fields: title
+
+    - id: section
+      description: 
+      operation: section
+      params: 
+      output:
+        fields: title
+
+    - id: sectionActives
+      description: 
+      operation: section
+      params: isInactive=false
+      output:
+        fields: id
+        operation: count
+
+    - id: Keywords
+      description: Keywords top10
+      operation: doQuery
+      params: |
+            SELECT
+              s.keyword_id,
+              COUNT(*) AS veces,
+              k.keyword_text
+            FROM
+                submission_search_object_keywords AS s
+            JOIN
+                submission_search_keyword_list AS k
+                ON s.keyword_id = k.keyword_id
+            GROUP BY
+                s.keyword_id,
+                k.keyword_text
+            HAVING
+                COUNT(*) > 1
+            ORDER BY
+                veces DESC
+            LIMIT 10;
+      output:
+        fields:
+
+    #Producción editorial:
+    #Revista:
+    - id: primer número
+      description: Año del primer número.
+      operation: issues
+      params: id=1
+      output:
+        fields: year
+      
+    - id: numeros publicados
+      description: Total de números publicados.
+      operation: issues
+      params: published=true
+      output:
+        fields: id
+        operation: count
+        
+    - id: numeros año
+      description: Números en el último año vencido.
+      operation: issues
+      params: year=2025
+      output:
+        fields: id
+    #Artículos
+    ##Artículos en el último número.
+    - id: cantidad articulos en el ultimo numero
+      description: cantidad articulos en el ultimo numero
+      operation: submissions
+      params: issueids=3
+      output:
+        fields: id
+        operation: count
+    ##Media de artículos por número.
+    - id: media de articulos
+      description: Media de artículos
+      operation: doQuery
+      params: |
+        SELECT i.issue_id,
+              COUNT(s.submission_id) AS submissions_per_issue
+        FROM issues i
+        LEFT JOIN publications p ON  p.publication_id = ig.publication_id
+        LEFT JOIN submissions s ON s.submission_id = p.submission_id
+        GROUP BY i.issue_id;
+      output:
+        fields:
+
+    - id: test
+      description: test
+      operation: doQuery
+      params: |
+        SELECT *
+        FROM submission_settings;
+      output:
+        fields:
+
+    ##Articles accepted: Artículos aceptados en el último año.
+    - id: articles accepted
+      description: Articles accepted
+      operation: submissions
+      params: status=3;dateSubmitted=2025
+      output:
+        fields: id
+        operation: count
+    ###Tasa de aceptación.
+
+    #Articles refused: Artículos rechazados en el último año.
+    - id: articles refused
+      description: Articles refused
+      operation: submissions
+      params: status=1;dateSubmitted=2025
+      output:
+        fields: id
+        operation: count
+    ##Rechazos en filtro previo.
+    ##Rechazos tras evaluación por pares.
+
+    #Days to publication: Tiempo medio de publicación de art. (desde XX)
+    #Formato de las galeradas: PDF, ePub, HTML, JATS…
+    - id: Formato de las galeradas
+      description: Formato de las galeradas
+      operation: submissionFile
+      params: 
+      output:
+        fields: mimetype
+    #Revisiones:
+    ##Media de revisores por artículo publicado (desde la fecha XX).
+    ##porcentaje de revisiones contempladas en plazo (desde la fecha XX).
+    ##Tiempo medio de revisión (desde la fecha XX).
+
+    #Difusión:
+    ##Número total de descargas de galeradas: downloads
+    - id: total de descargas de galeradas
+      description: cantidad articulos en el ultimo numero
+      operation: doQuery
+      params: |
+            SELECT
+                *
+            FROM
+                submissions;
+      output:
+        fields: 
+        operation: 
+    ##Número total de visitas a la página resumen de los artículos: views
+    ##Mismos números según el plugin COUNTER.
+    ##DOI del journal (si existe).
+    - id: DOI del journal
+      description: DOI del journal
+      operation: journalIdentity
+      params: 
+      output:
+        fields: 
+    ##OAI del journal (si existe).
+    - id: OAI del journal
+      description: OAI del journal
+      operation: page
+      params:
+      output:
+        fields: 
