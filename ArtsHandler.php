@@ -1222,8 +1222,16 @@ class ArtsHandler extends APIHandler
             $result = DB::cursor(DB::raw($sql)->getValue(DB::connection()->getQueryGrammar()), []);
 
             if ($result) {
-                $rows = $result->current();
-                return ($rows);
+                $rows = [];
+                while ($row = $result->current()) {
+                    $rows[] = $row;
+                    $result->next();
+                }
+                if (count($rows) == 1) {
+                    return $rows[0];
+                } else {
+                    return $rows;
+                }
             } else {
                 return json_encode([]);
             }

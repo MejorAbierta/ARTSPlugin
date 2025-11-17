@@ -207,7 +207,6 @@
 	{/function}
 
 
-
 </div><!-- .page -->
 </br>
 <button id="printBtn">Imprimir / Exportar PDF</button>
