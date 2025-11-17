@@ -4,6 +4,10 @@
 
 
 	<style>
+		body {
+			font-family: Arial, Helvetica, sans-serif;
+		}
+
 		code {
 			background: #0b1220;
 			color: #d6deeb;
@@ -19,15 +23,15 @@
 		{if $data|@count > 0}
 			<ul>
 				{foreach from=$data item=$row key=$key}
-					
+
 					{* is array *}
 					{if is_array($row) || is_object($row)}
 						{call name="showArray" data=$row}
 					{else}
-							
-							{$key}
-							
-							{$row}
+
+						{$key}
+
+						{$row}
 					{/if}
 
 				{/foreach}
@@ -40,7 +44,7 @@
 	{call name="showArray" data=$data}
 
 	{if $data|@count > 0}
-		
+
 		<h4>JSON</h4>
 		<code>
 			<div>{$data|json_encode|escape:'html'|replace:",":", "}</div>
