@@ -1,0 +1,238 @@
+report:
+  config:
+    id: 01
+    name: Transparencia
+    authorization: admin
+    format: html
+    template: transparencia.tpl
+
+  data:
+
+    - id: journalIdentity
+      description: 
+      operation: journalIdentity
+      params: 
+      output:
+        fields: id,name,publisherInstitution,printIssn,onlineIssn,contactName,contactEmail,description,urlPath,abbreviation,
+
+    - id: journalPreferences
+      description: 
+      operation: journalIdentity
+      params: 
+      output:
+        fields: openAccessPolicy,copyrightHolderType,copyrightYearBasis,version,supportedLocales,supportedSubmissionLocales
+      
+    - id: category
+      description: 
+      operation: category
+      params: 
+      output:
+        fields: title
+
+    - id: section
+      description: 
+      operation: section
+      params: 
+      output:
+        fields: title
+
+    - id: sectionActives
+      description: 
+      operation: section
+      params: isInactive=false
+      output:
+        fields: id
+        operation: count
+
+    - id: Keywords
+      description: Keywords top10
+      operation: doQuery
+      params: |
+            SELECT
+              s.keyword_id,
+              COUNT(*) AS veces,
+              k.keyword_text
+            FROM
+                submission_search_object_keywords AS s
+            JOIN
+                submission_search_keyword_list AS k
+                ON s.keyword_id = k.keyword_id
+            GROUP BY
+                s.keyword_id,
+                k.keyword_text
+            HAVING
+                COUNT(*) > 1
+            ORDER BY
+                veces DESC
+            LIMIT 10;
+      output:
+        fields:
+
+    - id: firstyear
+      description: Año del primer número.
+      operation: doQuery
+      params: |
+        SELECT YEAR(MIN(date_published)) AS year
+        FROM issues;
+      output:
+        fields: 
+      
+    - id: numeros publicados
+      description: Total de números publicados.
+      operation: issues
+      params: published=true
+      output:
+        fields: id
+        operation: count
+        
+    - id: numeros año
+      description: Números en el último año vencido.
+      operation: issues
+      params: year=2025
+      output:
+        fields: id
+
+    - id: cantidad articulos en el ultimo numero
+      description: cantidad articulos en el ultimo numero
+      operation: submissions
+      params: issueids=3
+      output:
+        fields: id
+        operation: count
+
+
+    - id: media de articulos
+      description: Media de artículos
+      operation: doQuery
+      params: |
+        SELECT i.issue_id,
+              COUNT(s.submission_id) AS submissions_per_issue
+        FROM issues i
+        LEFT JOIN publications p ON  p.publication_id = ig.publication_id
+        LEFT JOIN submissions s ON s.submission_id = p.submission_id
+        GROUP BY i.issue_id;
+      output:
+        fields:
+
+    - id: test
+      description: test
+      operation: doQuery
+      params: |
+        SELECT *
+        FROM submission_settings;
+      output:
+        fields:
+
+    - id: articles accepted
+      description: Articles accepted
+      operation: submissions
+      params: status=3;dateSubmitted=2025
+      output:
+        fields: id
+        operation: count
+    
+    - id : tasa_aceptacion
+      operation: doQuery
+      params: |
+        SELECT 
+          COUNT(CASE WHEN s.status = 3 THEN 1 END) AS aceptados,
+          COUNT(*) AS total,
+          ROUND((COUNT(CASE WHEN s.status = 3 THEN 1 END) / COUNT(*)) * 100, 2) AS tasa_aceptacion_porcentaje
+        FROM submissions s;
+
+    - id: articles_refused
+      description: Articles refused
+      operation: submissions
+      params: status=1;dateSubmitted=2025
+      output:
+        fields: id
+        operation: count
+    
+    - id: filtro_previo
+      description: Articles refused
+      operation: submissions
+      params: stageId=1;status=4;dateSubmitted=2025
+      output:
+        fields: id
+        operation: count
+
+    - id: por_pares
+      description: Articles refused
+      operation: submissions
+      params: stageId=3;status=4;dateSubmitted=2025
+      output:
+        fields: id
+        operation: count
+
+    - id : tiempo_medio
+      operation: doQuery
+      params: |
+        SELECT 
+          AVG(DATEDIFF(date_published, date_submitted)) AS tiempo_medio_publicacion_dias
+        FROM submissions
+        WHERE date_published IS NOT NULL
+          AND date_submitted IS NOT NULL;
+
+    - id: Formato de las galeradas
+      description: Formato de las galeradas
+      operation: submissionFile
+      params: 
+      output:
+        fields: mimetype
+
+    - id : media_revisores
+      operation: doQuery
+      params: |
+        SELECT AVG(revisores_por_articulo) AS media_revisores
+        FROM (
+          SELECT submission_id, COUNT(DISTINCT reviewer_id) AS revisores_por_articulo
+          FROM review_assignments
+          GROUP BY submission_id
+        ) AS revisores_articulos;
+
+    - id : porcentaje_revisiones
+      description: porcentaje de revisiones contempladas en plazo 
+      operation: doQuery
+      params: |
+        SELECT 
+          100.0 * SUM(CASE WHEN date_completed <= date_due THEN 1 ELSE 0 END) / COUNT(*) AS porcentaje_revisiones_en_plazo
+        FROM review_assignments
+        WHERE date_completed IS NOT NULL
+          AND date_due IS NOT NULL;
+
+    - id : media_revision
+      description: Tiempo medio de revisión
+      operation: doQuery
+      params: | 
+        SELECT AVG(DATEDIFF(ed.date_decided, s.date_submitted)) AS tiempo_medio_revision_dias
+        FROM submissions s
+        JOIN edit_decisions ed ON s.submission_id = ed.submission_id
+        WHERE s.date_submitted IS NOT NULL
+          AND ed.date_decided IS NOT NULL
+          AND ed.decision IN (2, 3, 4); 
+
+    - id: total de descargas de galeradas
+      description: cantidad articulos en el ultimo numero
+      operation: doQuery
+      params: |
+            SELECT
+                *
+            FROM
+                submissions;
+
+
+    - id: DOI del journal
+      description: DOI del journal
+      operation: doQuery
+      params: |
+              SELECT s.submission_id, ps.setting_value AS doi
+              FROM publication_settings ps
+              JOIN submissions s ON ps.publication_id = s.current_publication_id
+              WHERE ps.setting_name = 'pub-id::doi';
+
+    - id: OAI del journal
+      description: OAI del journal
+      operation: page
+      params:
+      output:
+        fields: 

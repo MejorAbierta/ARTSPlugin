@@ -83,10 +83,9 @@ class ArtsReportForm extends Form
         $contextId =  $context->getId();
 
         $contextDao = Application::getContextDAO();
-        $contextName = $contextDao->getById($contextId)->getName()["en"];
-
-
-        $templateManager->assign('baseURL', $request->getBaseUrl() . '/index.php/' . $contextName . '/ARTS/parseyaml/');
+        $base = $request->getBasePath();
+        
+        $templateManager->assign('baseURL', $base.'parseyaml/');
         $templateManager->assign('formats', [
             'json',
             'csv',
