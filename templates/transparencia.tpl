@@ -127,7 +127,7 @@
 
 		<tr>
 			<td>Keywords mas usadas</td>
-			<td>{call name="detailKeywords" data=$data.Keywords}</td>
+			<td>{$data.Keywords.keyword_text}</td>
 		</tr>
 
 		<tr>
@@ -208,19 +208,29 @@
 			<td>Rechazos en filtro previo.</td>
 			<td>{$data.por_pares.count}</td>
 		</tr>
-		
+
 		<tr>
 			<td>Formato de las galeradas.</td>
 			<td>{call name="detailFile" data=$data['Formato de las galeradas']}</td>
 		</tr>
+
+		<tr>
+			<td>Media de revisores por artículo publicado.</td>
+			<td>{$data.media_revisores}</td>
+		</tr>
+
+		<tr>
+			<td>Porcentaje de revisiones contempladas en plazo.</td>
+			<td>{$data.porcentaje_revisiones}</td>
+		</tr>
+		
+
+		<tr>
+			<td>Tiempo medio de revisión.</td>
+			<td>{$data.media_revision}</td>
+		</tr>
 	</table>
 
-	#Days to publication: Tiempo medio de publicación de art. (desde XX)
-	Formato de las galeradas: PDF, ePub, HTML, JATS…
-	Revisiones:
-	Media de revisores por artículo publicado (desde la fecha XX).
-	% de revisiones contempladas en plazo (desde la fecha XX).
-	Tiempo medio de revisión (desde la fecha XX).
 
 	</br>
 
