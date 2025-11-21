@@ -1,6 +1,6 @@
 # **Advanced Report Tool Suite (ARTS)**
 
-ARTS (Advanced Report Tool Suite) is a plugin for OJS designed to allow non-developer users to generate advanced reports through flexible YAML configuration files and/or access OJS DAO methods directly.
+ARTS (Advanced Report Tool Suite) is a plugin for **OJS 3.4+** designed to allow non-developer users to generate advanced reports through flexible YAML configuration files and/or access OJS DAO methods directly.
 
 ### **Use Cases**
 
@@ -21,23 +21,17 @@ The plugin offers two main functionalities:
 
 > ⚠️ **Security Notice**
 > 
-> Access to reports and API endpoints requires an appropriate token or specific user privileges. The plugin currently uses a hardcoded token stored within the plugin directory. Ensure this token is handled securely to prevent unauthorized access.
+> Access to reports and API endpoints requires an appropriate token or specific user privileges. The plugin currently uses a hardcoded token stored within the plugin directory. Ensure this token is handled securely to prevent unauthorized access. To configure, rename `TEMPLATE.env` to `.env` and add your token.
 
 ### **Reports Configuration**
 
-Each report accepts a `config` section to define its security level, output format, and template. The `data` section specifies a list of operations to execute, parameters, and fields to return.
+Each report accepts a `config` header section to define its security level, output format, and template. 
+The `data` section specifies a list of operations to execute, parameters, and fields to return.
 
 **Example Reports:**
 
 - A clone of the [FECYT plugin](https://github.com/MejorAbierta/fecytReportsPlugin): produces results similar to the FECYT plugin using DAO calls ([see config here](https://github.com/MejorAbierta/ARTSPlugin/blob/main/configs/sellofecythtml.yaml)).
 - A general **transparency report**: provides editorial status and metrics through DAO calls and optional SQL execution ([see config here](https://github.com/MejorAbierta/ARTSPlugin/blob/main/configs/transparencia_html.yaml)).
-
----
-
-## **System Requirements**
-
-- OJS **3.4** (later versions may work but are not fully tested).
-- Compressed plugin archive in **.tar.gz** format.
 
 ---
 
@@ -47,17 +41,18 @@ Each report accepts a `config` section to define its security level, output form
 
 - Log in with administrator privileges.
 - Navigate to `Settings > Website > Plugins`.
-- Select the Plugin Gallery, locate ARTS, and install it.
-- Enable the plugin and access `/ARTS` to configure reports.
+- Go the [plugin releases](https://github.com/MejorAbierta/ARTSPlugin/releases) and download the "arts.tar.gz" that fits with your OJS version.
+- Click on "Upload A New Plugin" and select the file you just downloaded.
+- Enable the plugin and click in the "Configuration" button to reach the plugin frontend.
 
 **Manual Installation:**
 
 ```
-1. Download the latest release from GitHub (ensure version compatibility).
-2. Extract files into plugins/generic/ARTS.
+1. Go the https://github.com/MejorAbierta/ARTSPlugin/releases and download the "arts.tar.gz" that fits with your OJS version.
+2. Extract files into plugins/generic/arts.
 3. Run:
    php lib/pkp/tools/installPluginVersion.php plugins/generic/ARTS/version.xml
-4. Enable the plugin and visit /ARTS to see your reports.
+4. Enable the plugin and visit /arts to see your reports.
 ```
 
 ---
@@ -99,16 +94,16 @@ report:
 
 These are the API methods that can be called directly via the ARTS API or referenced within YAML configuration files as `operation` entries. They expose core OJS data and allow structured retrieval of various entities. Methods are listed alphabetically for reference.
 
-| Operation | Description |
+| Operation | Output | 
 |-----------|-------------|
-| about | Retrieves "about" information for the journal. |
-| announcement | Retrieves announcement data. |
-| author | Retrieves author data: `id`, `givenName`, `familyName`, `email`, `publicationId`, `userGroupId`, `country`, `affiliation`. |
-| category | Retrieves category data: `id`, `title`, `description`, `parentId`, `contextId`, `sequence`, `path`, `image`, `sortOption`. |
+| about | "About" information for the journal. |
+| announcement | Announcement data (TBD) |
+| author | `id`, `givenName`, `familyName`, `email`, `publicationId`, `userGroupId`, `country`, `affiliation`. | 
+| category | Category data: `id`, `title`, `description`, `parentId`, `contextId`, `sequence`, `path`, `image`, `sortOption`. |
 | decision | Retrieves decision data: `id`, `dateDecided`, `decision`, `editorId`, `reviewRoundId`, `round`, `stageId`, `submissionId`. |
 | galleys | Retrieves galley data: `id`, `submissionFileId`, `isApproved`, `locale`, `label`, `publicationId`, `urlPath`, `urlRemote`, `doiId`. |
 | institution | (TBD). |
-| issues | Retrieves issue/volume data: `id`, `journalId`, `volume`, `number`, `year`, `published`, `datePublished`, `dateNotified`, `lastModified`, `accessStatus`, `openAccessDate`, `showVolume`, `showNumber`, `showYear`, `showTitle`, `styleFileName`, `originalStyleFileName`, `urlPath`, `doiId`, `description`, `title`. |
+| issues | Issue/volume data: `id`, `journalId`, `volume`, `number`, `year`, `published`, `datePublished`, `dateNotified`, `lastModified`, `accessStatus`, `openAccessDate`, `showVolume`, `showNumber`, `showYear`, `showTitle`, `styleFileName`, `originalStyleFileName`, `urlPath`, `doiId`, `description`, `title`. |
 | journalIdentity | Retrieves journal identity information with fields such as `id`, `urlPath`, `enabled`, `primaryLocale`, `currentIssueId`, `acronym`, `authorGuidelines`, `contactEmail`, `editorialTeam`, `licenseUrl`, `onlineIssn`, `printIssn`, and OJS version. |
 | publications | Retrieves publication data: `id`, `accessStatus`, `datePublished`, `lastModified`, `primaryContactId`, `sectionId`, `submissionId`, `status`, `urlPath`, `version`, `doiId`, `categoryIds`, `copyrightYear`, `issueId`, `abstract`, `title`, `locale`, `authors`, `keywords`, `subjects`, `disciplines`, `languages`, `supportingAgencies`, `galleys`. |
 | representation | Retrieves representation data: `submissionFileId`, `isApproved`, `locale`, `label`, `publicationId`, `urlPath`, `urlRemote`, `doiId`. |
@@ -124,12 +119,36 @@ These are the API methods that can be called directly via the ARTS API or refere
 
 ## **Generic Operations: DAO and doQuery**
 
-- **DAO**: Dynamically calls any public method on any OJS DAO class. Requires specifying `dao` (the DAO class name), `method` (method name), and optional `params` (array of arguments). The plugin uses reflection to invoke the DAO method and returns the result as JSON. Useful for advanced queries not exposed via standard operations. (TBD)
+- **DAO**: Dynamically calls any public method on any OJS DAO class. Requires specifying `dao` (the DAO class name), `method` (method name), and optional `params` (array of arguments). See [PKP documentation](#TBD) for more information. The plugin will invoke the DAO method and return the result as JSON. This is useful for advanced queries not exposed via standard operations, but notice PKP is transitioning to Eloquent ORM in OJS 3.5 so this feature will be deprecated soon. (TBD)
 
-- **doQuery($args, $request)**: Executes an arbitrary SQL query directly against the database. The SQL is provided in the `data.params` field of the YAML. All other sections of the YAML (e.g., `data`, `output`) are ignored. \
+- **doQuery**: Executes an arbitrary SQL SELECT query directly against the database. This is intentionally limitated to SELECT queries to avoid security issues. The SQL is provided in the `data.params` field of the YAML. Take in consideration that all other sections of the YAML (e.g., `data`, `output`) will keep working over the selected data. \
   **Warning:** SQL is database-dependent (MariaDB, MySQL, PostgreSQL).
 
 These generic operations provide maximum flexibility but require understanding of OJS internal DAOs and the database schema.
+
+---
+
+# About the config files
+
+(Marc)
+
+---
+
+# About the templates
+
+(Marc)
+
+---
+
+# Roadmap
+
+- [x] ...(TBD)
+- [x] Basic interface.
+- [x] Arbitrary SQL.
+- [ ] Improved interface to create the YAMLs.
+- [ ] PHP snippets to extend operations.
+
+Actually this project is finished and no further development will be done until we got a new grant.(TBD)
 
 ---
 
