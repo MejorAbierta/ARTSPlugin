@@ -97,29 +97,28 @@ These are the API methods that can be called directly via the ARTS API or refere
 | Operation | Output | 
 |-----------|-------------|
 | about | "About" information for the journal. |
-| announcement | Announcement data (TBD) |
+| announcement | `announcement_id`,`announcement_settings`,`assoc_type`,`assoc_id`,`type_id`,`announcement_types`,`date_expire`,`date_posted` |
 | author | `id`, `givenName`, `familyName`, `email`, `publicationId`, `userGroupId`, `country`, `affiliation`. | 
 | category | Category data: `id`, `title`, `description`, `parentId`, `contextId`, `sequence`, `path`, `image`, `sortOption`. |
 | decision | Retrieves decision data: `id`, `dateDecided`, `decision`, `editorId`, `reviewRoundId`, `round`, `stageId`, `submissionId`. |
 | galleys | Retrieves galley data: `id`, `submissionFileId`, `isApproved`, `locale`, `label`, `publicationId`, `urlPath`, `urlRemote`, `doiId`. |
-| institution | (TBD). |
+| institution | `institution_ip`, `institution_settings`, `institutional_subscriptions`, `metrics_counter_submission_institution_daily`, `metrics_counter_submission_institution_monthly`, `usage_stats_institution_temporary_records` |
 | issues | Issue/volume data: `id`, `journalId`, `volume`, `number`, `year`, `published`, `datePublished`, `dateNotified`, `lastModified`, `accessStatus`, `openAccessDate`, `showVolume`, `showNumber`, `showYear`, `showTitle`, `styleFileName`, `originalStyleFileName`, `urlPath`, `doiId`, `description`, `title`. |
 | journalIdentity | Retrieves journal identity information with fields such as `id`, `urlPath`, `enabled`, `primaryLocale`, `currentIssueId`, `acronym`, `authorGuidelines`, `contactEmail`, `editorialTeam`, `licenseUrl`, `onlineIssn`, `printIssn`, and OJS version. |
 | publications | Retrieves publication data: `id`, `accessStatus`, `datePublished`, `lastModified`, `primaryContactId`, `sectionId`, `submissionId`, `status`, `urlPath`, `version`, `doiId`, `categoryIds`, `copyrightYear`, `issueId`, `abstract`, `title`, `locale`, `authors`, `keywords`, `subjects`, `disciplines`, `languages`, `supportingAgencies`, `galleys`. |
 | representation | Retrieves representation data: `submissionFileId`, `isApproved`, `locale`, `label`, `publicationId`, `urlPath`, `urlRemote`, `doiId`. |
-| reviews | (TBD). |
-| reviewers | (TBD). |
+| reviews | `review_round_file_id`, `submission_id`, `submissions`, `review_round_id`, `review_rounds`, `stage_id`, `submission_file_id` |
 | section | Retrieves section data: `id`, `contextId`, `reviewFormId`, `sequence`, `editorRestricted`, `metaIndexed`, `metaReviewed`, `abstractsNotRequired`, `hideTitle`, `hideAuthor`, `isInactive`, `wordCount`, `abbrev`, `policy`, `title`. |
 | submissionFile | Returns submission file data: `assocId`, `assocType`, `createdAt`, `fileId`, `fileStage`, `genreId`, `sourceSubmissionFileId`, `submissionId`, `updatedAt`, `uploaderUserId`, `viewable`, `dateCreated`, `language`, `name`, `locale`, `path`, `mimetype`. |
 | submissions | Retrieves submission data: `id`, `contextId`, `currentPublicationId`, `dateLastActivity`, `dateSubmitted`, `lastModified`, `locale`, `stageId`, `status`, `submissionProgress`, `publications`. |
 | urls | (TBD). |
-| userGroup | (TBD). |
+| userGroup | `user_group_id`, `context_id`, `role_id`, `is_default`, `show_title`, `permit_self_registration`, `permit_metadata_edit` |
 
 ---
 
 ## **Generic Operations: DAO and doQuery**
 
-- **DAO**: Dynamically calls any public method on any OJS DAO class. Requires specifying `dao` (the DAO class name), `method` (method name), and optional `params` (array of arguments). See [PKP documentation](#TBD) for more information. The plugin will invoke the DAO method and return the result as JSON. This is useful for advanced queries not exposed via standard operations, but notice PKP is transitioning to Eloquent ORM in OJS 3.5 so this feature will be deprecated soon. (TBD)
+- **DAO**: Dynamically calls any public method on any OJS DAO class. Requires specifying `dao` (the DAO class name), `method` (method name), and optional `params` (array of arguments). See [PKP documentation](https://docs.pkp.sfu.ca/dev/documentation/3.3/en/architecture-database#daos) for more information. The plugin will invoke the DAO method and return the result as JSON. This is useful for advanced queries not exposed via standard operations, but notice PKP is transitioning to Eloquent ORM in OJS 3.5 so this feature will be deprecated soon. ([See doc.](https://docs.pkp.sfu.ca/dev/documentation/en/architecture-daos#deprecated-daos))
 
 - **doQuery**: Executes an arbitrary SQL SELECT query directly against the database. This is intentionally limitated to SELECT queries to avoid security issues. The SQL is provided in the `data.params` field of the YAML. Take in consideration that all other sections of the YAML (e.g., `data`, `output`) will keep working over the selected data. \
   **Warning:** SQL is database-dependent (MariaDB, MySQL, PostgreSQL).
@@ -132,6 +131,24 @@ These generic operations provide maximum flexibility but require understanding o
 
 (Marc)
 
+```
+report:
+  config:
+    name: Report
+    authorization: role
+    format: html
+    template: default.tpl
+
+  data:
+    - id: 01
+      title: Name
+      operation: author
+      params: affiliation=Universidad Rey Juan Carlos
+      output:
+        fields: title
+        operation: count
+```
+
 ---
 
 # About the templates
@@ -142,7 +159,10 @@ These generic operations provide maximum flexibility but require understanding o
 
 # Roadmap
 
-- [x] ...(TBD)
+- [x] Filter by field
+- [x] JSON output
+- [x] HTML output
+- [x] XML output
 - [x] Basic interface.
 - [x] Arbitrary SQL.
 - [ ] Improved interface to create the YAMLs.
