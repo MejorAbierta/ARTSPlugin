@@ -181,6 +181,7 @@ report:
         fields: mimetype
 
     - id : media_revisores
+      description: Media de revisores por artículo publicado
       operation: doQuery
       params: |
         SELECT AVG(revisores_por_articulo) AS media_revisores
