@@ -127,7 +127,7 @@
 
 		<tr>
 			<td>Keywords mas usadas</td>
-			<td>{call name="detailKeywords" data=$data.Keywords}</td>
+			<td>{$data.Keywords.keyword_text}</td>
 		</tr>
 
 		<tr>
@@ -208,11 +208,12 @@
 			<td>Rechazos en filtro previo.</td>
 			<td>{$data.por_pares.count}</td>
 		</tr>
-		
+
 		<tr>
 			<td>Formato de las galeradas.</td>
 			<td>{call name="detailFile" data=$data['Formato de las galeradas']}</td>
 		</tr>
+
 		<tr>
 			<td>Media de revisores por artículo publicado</td>
 			<td>{$data.media_revisores}</td>
