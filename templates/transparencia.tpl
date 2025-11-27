@@ -215,22 +215,22 @@
 		</tr>
 
 		<tr>
-			<td>Media de revisores por artículo publicado.</td>
+			<td>Media de revisores por artículo publicado</td>
 			<td>{$data.media_revisores}</td>
-		</tr>
-
-		<tr>
-			<td>Porcentaje de revisiones contempladas en plazo.</td>
-			<td>{$data.porcentaje_revisiones}</td>
 		</tr>
 		
 
 		<tr>
-			<td>Tiempo medio de revisión.</td>
+			<td>% de revisiones contempladas en plazo</td>
+			<td>{$data.porcentaje_revisiones}</td>
+		</tr>
+
+		<tr>
+			<td>Tiempo medio de revisión</td>
 			<td>{$data.media_revision}</td>
 		</tr>
+		
 	</table>
-
 
 	</br>
 
