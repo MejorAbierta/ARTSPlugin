@@ -41,25 +41,7 @@ class ArtsReportForm extends Form
 
         $templateManager = TemplateManager::getManager();
 
-        $templateManager->assign('operations', [
-            'about',
-            'author',
-            'reviewers',
-            'journalIdentity',
-            'announcement',
-            'category',
-            'citation',
-            'decision',
-            'institution',
-            'submissionFile',
-            'DAO',
-            'submissions',
-            'issues',
-            'urls',
-            'reviews',
-            'eventlogs',
-            'user'
-        ]);
+        $templateManager->assign('operations', ArtsHandler::DATA_OPERATIONS);
         try {
             $folderPath = dirname(__FILE__, 1) . '/configs/';
             $files = scandir($folderPath);
