@@ -100,18 +100,26 @@ function download_csvs($files, $filename)
 
 function isPureSelect(string $sql): bool
 {
-    $trimmed = trim($sql);
+
+    $sqlWithoutComments = preg_replace('!/\*.*?\*/!s', '', $sql);
+    $sqlWithoutComments = preg_replace('/--.*$/m', '', $sqlWithoutComments);
+    $sqlWithoutComments = preg_replace('/#.*$/m', '', $sqlWithoutComments);
+
+    $trimmed = trim($sqlWithoutComments);
 
     if (!preg_match('/^SELECT\s/i', $trimmed)) {
         return false;
     }
 
     $forbidden = [
-        'INSERT', 'UPDATE', 'DELETE', 'REPLACE',
-        'CREATE', 'DROP', 'ALTER', 'TRUNCATE',
-        'GRANT', 'REVOKE', 'SET', 'EXEC', 'CALL',
-        'MERGE', 'UPSERT', 'LOCK', 'UNLOCK',
-        'BEGIN', 'COMMIT', 'ROLLBACK'
+        'INSERT', 'UPDATE', 'DELETE', 'REPLACE', 'MERGE', 'UPSERT',
+        'CREATE', 'DROP', 'ALTER', 'TRUNCATE', 'RENAME',
+        'GRANT', 'REVOKE',
+        'BEGIN', 'COMMIT', 'ROLLBACK', 'SAVEPOINT',
+        'SET', 'EXEC', 'EXECUTE', 'CALL', 'DO', 'HANDLER',
+        'LOAD DATA', 'LOAD XML',
+        'LOCK TABLES', 'UNLOCK TABLES',
+        'INTO OUTFILE', 'INTO DUMPFILE'
     ];
 
     $pattern = '/\b(' . implode('|', $forbidden) . ')\b/i';
