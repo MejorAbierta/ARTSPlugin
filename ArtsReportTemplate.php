@@ -9,19 +9,12 @@ use PKP\form\validation\FormValidatorPost;
 
 class ArtsReportTemplate extends Form
 {
-    /* @var int Associated context ID */
     private $contextId;
 
-    /* @var ReviewersReport  */
     private $plugin;
 
     private $application;
 
-    /**
-     * Constructor
-     *
-     * @param $plugin ReviewersReport Manual payment plugin
-     */
     public function __construct($plugin,$template)
     {
         $this->plugin = $plugin;
@@ -41,8 +34,6 @@ class ArtsReportTemplate extends Form
       
     }
 
-
-
     public function display($request = null, $template = null, $args = null)
     {
   
@@ -53,7 +44,7 @@ class ArtsReportTemplate extends Form
         $templateManager->assign('data', $args);
 
 
-        $templateManager->display($this->plugin->getTemplateResource($template));
+        $templateManager->display($this->plugin->getTemplateResource("reports/".$template));
     }
    
 }
