@@ -7,6 +7,7 @@ use APP\template\TemplateManager;
 use PKP\form\Form;
 use PKP\form\validation\FormValidatorCSRF;
 use PKP\form\validation\FormValidatorPost;
+use Symfony\Component\Yaml\Yaml;
 
 class ArtsReportForm extends Form
 {
@@ -48,22 +49,25 @@ class ArtsReportForm extends Form
             $filesnames = [];
             foreach ($files as $file) {
                 if (is_file($folderPath . '/' . $file)) {
-                    $filesnames[] = str_replace('.yaml', '', $file);
+                    $yaml = Yaml::parseFile($folderPath . '/' . $file);
+                    $temp = [];
+                                  
+                    $temp['name'] = $yaml['report']['config']['name'];
+                    $temp['description'] = $yaml['report']['config']['description'];
+                    $temp['filename'] = str_replace('.yaml', '', $file);
+
+                    $filesnames[] = $temp;
                 }
             }
             $templateManager->assign('filesnames', $filesnames);
         } catch (\Throwable $th) {
-            error_log("BENJI: ".$th->getMessage());
+            error_log("ARTS error: ".$th->getMessage());
         }
 
 
         $context = Application::get()
             ->getRequest()
             ->getContext();
-
-
-        $contextId =  $context->getId();
-
 
         
         $journalPath = $request->getContext()->getPath();

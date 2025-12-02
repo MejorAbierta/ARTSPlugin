@@ -51,9 +51,7 @@ trait ReportTrait
                 error_log("Error creating file.");
             }
         } else {
-            $dateStart = date('Y-01-01');
-            $dateEnd = date('Y-m-d');
-            $form->display($request, 'list.tpl', [$dateStart, $dateEnd]);
+            $form->display($request, 'list.tpl');
         }
     }
 }
