@@ -6,9 +6,10 @@
 	<ul>
 		
 		{foreach from=$filesnames item=item key=key name=name}
-
-			<li><a href="{$baseURL}{$item}"> {$item}</a></li>
-
+			
+			<li><a href="{$baseURL}{$item.filename}"> {$item.name}</a></li>
+			<p>{$item.description}
+			</p>
 		{/foreach}
 	</ul>
 
@@ -37,6 +38,8 @@
 			width: 100%;
 		}
 	</style>
+
+	<a href="https://github.com/MejorAbierta/ARTSPlugin">ReadMe</a>
 
 </div><!-- .page -->
 {include file="frontend/components/footer.tpl"}

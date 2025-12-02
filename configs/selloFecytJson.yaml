@@ -1,7 +1,8 @@
 report:
   config:
     id: 01
-    name: SelloFECYT2025
+    name: Sello FECYT 2025 JSON
+    description: Esta configuración expone los datos para la optención del sello fecyt en formato Json
     authorization: admin
     format: json
   data:
