@@ -1,7 +1,7 @@
 report:
   config:
     id: 01
-    name: Transparencia
+    name: Transparencia HTML
     authorization: admin
     format: html
     template: transparencia.tpl
