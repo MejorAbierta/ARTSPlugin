@@ -161,7 +161,7 @@ Three initial-basic templates were included:
 - [ ] Add to PKP's gallery.
 
 > [!NOTE]
-> This project will conclude on December 31, 2025, and no further development will be carried out until a new grant is obtained.
+> This project concludes on December 31, 2025, and no further development will be carried out until we new resources are obtained.
 ---
 
 ## **Notes**
