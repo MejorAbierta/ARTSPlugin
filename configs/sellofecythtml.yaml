@@ -4,19 +4,19 @@ report:
     name: Sello FECYT 2025 formato html
     description: Esta configuración expone los datos para la optención del sello fecyt en Html
     authorization: admin
-    format: html
-    template: fecyt.tpl
+    format: html #output format, can be html, csv, json and xml
+    template: fecyt.tpl #output with html require a template, you should put your templates in templates/reports 
 
   data:
     # Export contents About
     # Devuelve el contenido de la sección "About" de la revista.
-    - id: about
-      description: Export contents About
+    - id: about #Name of the field to manage
+      description: Export contents About #description (optional)
       operation: about
-      params:
+      params: #here can put the params like id=1,2,3;status=1
       output:
-        fields:
-        
+        fields: #here can filter to get only selected fields example id,affiliation,familyName,givenName
+
     # Export article documentation
     # Returns the number of articles in "Queued" state.
     - id: STATUS_QUEUED
@@ -25,7 +25,7 @@ report:
       params: status=1
       output:
         fields: id
-        operation: count
+        operation: count # return the number of items
 
     # Returns the number of articles in "Published" state.
     - id: STATUS_PUBLISHED

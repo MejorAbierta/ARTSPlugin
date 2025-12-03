@@ -33,7 +33,10 @@
 		}
 	</style>
 
-	{debug}
+
+
+	{*/ use debug tag to see the data fields /*}
+	{*/ use data.id to get the data returned in the configured yaml /*}
 
 	</br><b>About</b>
 	{$data.about.en}
