@@ -16,9 +16,9 @@ report:
       params:
       output:
         fields:
-
+        
     # Export article documentation
-    # Devuelve el número de artículos en estado "Queued" (en cola).
+    # Returns the number of articles in "Queued" state.
     - id: STATUS_QUEUED
       description: Export article documentation
       operation: submissions
@@ -27,7 +27,7 @@ report:
         fields: id
         operation: count
 
-    # Devuelve el número de artículos en estado "Published" (publicado).
+    # Returns the number of articles in "Published" state.
     - id: STATUS_PUBLISHED
       description:
       operation: submissions
@@ -36,7 +36,7 @@ report:
         fields: id
         operation: count
 
-    # Devuelve el número de artículos en estado "Declined" (rechazado).
+    # Returns the number of articles in "Declined" state.
     - id: STATUS_DECLINED
       description:
       operation: submissions
@@ -45,7 +45,7 @@ report:
         fields: id
         operation: count
 
-    # Devuelve el número de artículos en estado "Scheduled" (programado para publicación).
+    # Returns the number of articles in "Scheduled" state (scheduled for publication).
     - id: STATUS_SCHEDULED
       description:
       operation: submissions
@@ -55,7 +55,7 @@ report:
         operation: count
 
     # Export author data
-    # Devuelve los datos de los autores (ID, afiliación, nombre y apellidos).
+    # Returns author data (ID, affiliation, family name and given name).
     - id: Export_author_data
       description: Export author data
       operation: author
@@ -64,7 +64,7 @@ report:
         fields: id,affiliation,familyName,givenName
 
     # Export reviewer data
-    # Devuelve los datos de los revisores (ID, afiliación, nombre y apellidos).
+    # Returns reviewer data (ID, affiliation, family name and given name).
     - id: Export_reviewer_data
       description: Export reviewer data
       operation: reviewers
@@ -73,7 +73,7 @@ report:
         fields: id,affiliation,familyName,givenName
 
     # Export issues documentation
-    # Devuelve la documentación de los números publicados (volumen, número y año).
+    # Returns documentation of published issues (volume, number and year).
     - id: Export_issues_documentation
       description: Export issues documentation
       operation: issues
@@ -82,7 +82,7 @@ report:
         fields: volume,number,year
 
     # Export journal identification data
-    # Devuelve los datos de identificación de la revista (nombre, ISSN impreso, ISSN en línea y editor).
+    # Returns journal identification data (name, print ISSN, online ISSN and publisher).
     - id: Export_journal_identification_data
       description: Export journal identification data
       operation: journalIdentity
@@ -91,7 +91,7 @@ report:
         fields: name,printIssn,onlineIssn,publisherInstitution
 
     # Export information from the article submission page
-    # Devuelve información de la página de envío de artículos (nombre, directrices para autores, lista de comprobación de envíos, aviso de derechos de autor y declaración de privacidad).
+    # Returns information from the article submission page (name, author guidelines, submission checklist, copyright notice and privacy statement).
     - id: Export_information_from_the_article_submission_page
       description: Export information from the article submission page
       operation: journalIdentity
@@ -99,7 +99,7 @@ report:
       output:
         fields: name,authorGuidelines,submissionChecklist,copyrightNotice,privacyStatement
 
-    # Devuelve información de las secciones de la revista (título y política).
+    # Returns information about the journal sections (title and policy).
     - id: Export_information_from_the_article_submission_page_2
       description: Export information from the article submission page
       operation: section
@@ -108,7 +108,7 @@ report:
         fields: title,policy
 
     # Export URLs
-    # Devuelve las URLs de la revista.
+    # Returns the journal's URLs.
     - id: Export_URLs
       description: Export URLs
       operation: urls
@@ -117,7 +117,7 @@ report:
         fields:
 
     # Export editorial flow of the selected submission
-    # Devuelve las revisiones de los envíos con estado "Published" y fecha de envío en 2025.
+    # Returns the reviews of submissions with status "Published" and submission date in 2025.
     - id: Export_editorial_flow_of_the_selected_submission_reviews
       description: reviews
       operation: reviews
@@ -125,7 +125,7 @@ report:
       output:
         fields:
 
-    # Devuelve los logs de eventos de los envíos con estado "Published" y fecha de envío en 2025.
+    # Returns the event logs of submissions with status "Published" and submission date in 2025.
     - id: Export_editorial_flow_of_the_selected_submission_eventlogs
       description: eventlogs
       operation: eventlogs
