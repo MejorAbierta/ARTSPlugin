@@ -64,6 +64,7 @@ The `data` section specifies a list of operations to execute, parameters, and fi
 report:
   config:
     name: Report
+    description: Description for the report
     authorization: role
     format: json
 
@@ -111,11 +112,11 @@ These are the API methods that can be called directly via the ARTS API or refere
 | publications | Publication data | `id`, `accessStatus`, `datePublished`, `lastModified`, `primaryContactId`, `sectionId`, `submissionId`, `status`, `urlPath`, `version`, `doiId`, `categoryIds`, `copyrightYear`, `issueId`, `abstract`, `title`, `locale`, `authors`, `keywords`, `subjects`, `disciplines`, `languages`, `supportingAgencies`, `galleys`. |
 | representation | Representation data | `submissionFileId`, `isApproved`, `locale`, `label`, `publicationId`, `urlPath`, `urlRemote`, `doiId`. |
 | reviews | Reviews data | `review_round_file_id`, `submission_id`, `submissions`, `review_round_id`, `review_rounds`, `stage_id`, `submission_file_id` |
-| reviewers | (TBD). |
+| users | `id`, `givenName`, `familyName`, `email`, `publicationId`, `userGroupId`, `country`, `affiliation`. |
 | section | Section data | `id`, `contextId`, `reviewFormId`, `sequence`, `editorRestricted`, `metaIndexed`, `metaReviewed`, `abstractsNotRequired`, `hideTitle`, `hideAuthor`, `isInactive`, `wordCount`, `abbrev`, `policy`, `title`. |
 | submissionFile | Submission file data | `assocId`, `assocType`, `createdAt`, `fileId`, `fileStage`, `genreId`, `sourceSubmissionFileId`, `submissionId`, `updatedAt`, `uploaderUserId`, `viewable`, `dateCreated`, `language`, `name`, `locale`, `path`, `mimetype`. |
 | submissions | Submission data | `id`, `contextId`, `currentPublicationId`, `dateLastActivity`, `dateSubmitted`, `lastModified`, `locale`, `stageId`, `status`, `submissionProgress`, `publications`. |
-| urls | (TBD). |
+| urls | urls of the journal |
 | userGroup | User group data | `user_group_id`, `context_id`, `role_id`, `is_default`, `show_title`, `permit_self_registration`, `permit_metadata_edit` |
 
 ---
