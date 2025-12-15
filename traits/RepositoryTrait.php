@@ -82,8 +82,7 @@ trait RepositoryTrait
         $data = [];
 
         foreach ($ids as $id) {
-            $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
-            $data[] = $reviewAssignmentDao->getBySubmissionId($id);
+            $data[] = $data[] = Repo::reviewAssignment()->get($id);
         }
 
         if ($fromyaml == null) {
