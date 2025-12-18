@@ -1,36 +1,133 @@
 report:
   config:
     id: 01
-    name: Sello FECYT 2025 JSON
-    description: Esta configuración expone los datos para la optención del sello fecyt en formato Json
+    name: Sello FECYT 2025 formato json
+    description: Esta configuración expone los datos para la optención del sello fecyt en Html
     authorization: admin
-    format: json
+    format: json #output format, can be html, csv, json and xml
+   
   data:
-
-    - id: 2
-      description: Composición y apertura del equipo editorial (ver 3.1)
+    # Export contents About
+    # Devuelve el contenido de la sección "About" de la revista.
+    - id: about #Name of the field to manage
+      description: Export contents About #description (optional)
       operation: about
-      params: editorialTeam
+      params: #here can put the params like id=1,2,3;status=1
       output:
-        fields:
+        fields: #here can filter to get only selected fields example id,affiliation,familyName,givenName
 
-    - id: 3
-      description: Información pública acerca del envío de los manuscritos (ver 3.2)
-      operation: about
-      params: submissions
+    # Export article documentation
+    # Returns the number of articles in "Queued" state.
+    - id: STATUS_QUEUED
+      description: Export article documentation
+      operation: submissions
+      params: status=1
       output:
-        fields:
+        fields: id
+        operation: count # return the number of items
 
-    - id: 4
-      description: Periodicidad (ver 3.3)
-      operation: about
-      params: 
+    # Returns the number of articles in "Published" state.
+    - id: STATUS_PUBLISHED
+      description:
+      operation: submissions
+      params: status=3
       output:
-        fields: 
+        fields: id
+        operation: count
 
-    - id: 5
-      description: Arbitraje científico externo (ver 3.4)
+    # Returns the number of articles in "Declined" state.
+    - id: STATUS_DECLINED
+      description:
+      operation: submissions
+      params: status=4
+      output:
+        fields: id
+        operation: count
+
+    # Returns the number of articles in "Scheduled" state (scheduled for publication).
+    - id: STATUS_SCHEDULED
+      description:
+      operation: submissions
+      params: status=5
+      output:
+        fields: id
+        operation: count
+
+    # Export author data
+    # Returns author data (ID, affiliation, family name and given name).
+    - id: Export_author_data
+      description: Export author data
+      operation: author
+      params:
+      output:
+        fields: id,affiliation,familyName,givenName
+
+    # Export reviewer data
+    # Returns reviewer data (ID, affiliation, family name and given name).
+    - id: Export_reviewer_data
+      description: Export reviewer data
       operation: reviewers
-      params: 
+      params:
       output:
-        fields: givenName,familyName
+        fields: id,affiliation,familyName,givenName
+
+    # Export issues documentation
+    # Returns documentation of published issues (volume, number and year).
+    - id: Export_issues_documentation
+      description: Export issues documentation
+      operation: issues
+      params:
+      output:
+        fields: volume,number,year
+
+    # Export journal identification data
+    # Returns journal identification data (name, print ISSN, online ISSN and publisher).
+    - id: Export_journal_identification_data
+      description: Export journal identification data
+      operation: journalIdentity
+      params:
+      output:
+        fields: name,printIssn,onlineIssn,publisherInstitution
+
+    # Export information from the article submission page
+    # Returns information from the article submission page (name, author guidelines, submission checklist, copyright notice and privacy statement).
+    - id: Export_information_from_the_article_submission_page
+      description: Export information from the article submission page
+      operation: journalIdentity
+      params:
+      output:
+        fields: name,authorGuidelines,submissionChecklist,copyrightNotice,privacyStatement
+
+    # Returns information about the journal sections (title and policy).
+    - id: Export_information_from_the_article_submission_page_2
+      description: Export information from the article submission page
+      operation: section
+      params:
+      output:
+        fields: title,policy
+
+    # Export URLs
+    # Returns the journal's URLs.
+    - id: Export_URLs
+      description: Export URLs
+      operation: urls
+      params:
+      output:
+        fields:
+
+    # Export editorial flow of the selected submission
+    # Returns the reviews of submissions with status "Published" and submission date in 2025.
+    - id: Export_editorial_flow_of_the_selected_submission_reviews
+      description: reviews
+      operation: reviews
+      params: status=3;dateSubmitted=2025
+      output:
+        fields:
+
+    # Returns the event logs of submissions with status "Published" and submission date in 2025.
+    - id: Export_editorial_flow_of_the_selected_submission_eventlogs
+      description: eventlogs
+      operation: eventlogs
+      params: status=3;dateSubmitted=2025
+      output:
+        fields:

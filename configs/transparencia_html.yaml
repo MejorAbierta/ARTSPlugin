@@ -2,6 +2,7 @@ report:
   config:
     id: 01
     name: Transparencia HTML
+    description: Report about status journal
     authorization: admin
     format: html
     template: transparencia.tpl
