@@ -1,0 +1,68 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-15T15:49:00-07:00\n"
+"PO-Revision-Date: 2025-12-15T15:49:00-07:00\n"
+"Last-Translator: Benjamin Rus \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "plugins.generic.arts.name"
+msgstr "ARTS"
+
+msgid "plugins.generic.arts.displayName"
+msgstr "Advanced Report Tool Suite - ARTS"
+
+msgid "plugins.generic.arts.description"
+msgstr "Módulo Advanced Report Tool Suite - ARTS"
+
+msgid "plugins.generic.arts.title"
+msgstr "Título"
+
+msgid "plugins.generic.arts.operation"
+msgstr "Operación"
+
+msgid "plugins.generic.arts.add"
+msgstr "Añadir"
+
+msgid "plugins.generic.arts.params"
+msgstr "Parametros"
+
+msgid "plugins.generic.arts.filter"
+msgstr "Filtro"
+
+msgid "plugins.generic.arts.fields"
+msgstr "Campos"
+
+msgid "plugins.generic.arts.description"
+msgstr "Descripción"
+
+msgid "plugins.generic.arts.format"
+msgstr "Formato"
+
+msgid "plugins.generic.arts.auth"
+msgstr "Autorización"
+
+msgid "plugins.generic.arts.accept"
+msgstr "Aceptar"
+
+msgid "plugins.generic.arts.file"
+msgstr "Nombre del fichero"
+
+msgid "plugins.generic.arts.configurations"
+msgstr "Configuraciones"
+
+msgid "plugins.generic.arts.description.text"
+msgstr  "
+		"<p>El módulo <b>ARTS</b> habilita la extracción avanzada de datos en <b>OJS</b>, "
+		"permitiendo la creación de <b>informes personalizados</b> apartir de ficheros configurables <b>YAML</b>.</br>" 
+		"También provee de multiples <b>formatos de salida</b> como <b>JSON</b>, <b>XML</b>"
+		"<b>HTML</b>, o <b>CSV/ZIP</b>.</br>"
+		"Para mas información o ejemplos de uso visita el "
+		"<a href=\"https://github.com/MejorAbierta/ARTSPlugin/blob/main/README.md\">README</a> del módulo."
+		"</p>"
+		"
