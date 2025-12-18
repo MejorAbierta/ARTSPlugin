@@ -59,22 +59,30 @@ class ArtsReportGenerator
             if (count($fields) > 0) {
                 $filtered = $this->filterFileds($output, $fields);
             } else {
-                $filtered = json_decode(json_encode($output), true);
+                $filtered = $this->cleanArray($output);
             }
 
             if (isset($data['output']['operation'])) {
                 if ($data['output']['operation'] == 'count' && is_array($filtered)) {
-                    $filtered[$data['output']['operation']] = count($filtered);
+                    $operationKey = $data['output']['operation'];
+                    array_unshift($filtered, [$operationKey => count($filtered)]);
                 }
             }
             if ($filtered != "No data") {
+                $res = null;
+
+                if (array_key_exists(0, $filtered)) {
+                    $res = array_values($filtered);
+                } else {
+                    $res = $filtered;
+                }
 
                 switch ($yaml['report']['config']['format']) {
                     case 'csv':
-                        $values[$data['id']] = json_to_csv_string(json_encode($filtered));
+                        $values[$data['id']] = json_to_csv_string(json_encode($res));
                         break;
                     default:
-                        $values[$data['id']] = $filtered;
+                        $values[$data['id']] = $res;
                         break;
                 }
             }
@@ -149,8 +157,32 @@ class ArtsReportGenerator
         }
         if (count($result) == 1) {
             return $result[0];
-        } else {
-            return $result;
         }
+        return $result;
+    }
+
+    function cleanArray($data)
+    {
+        if ($data == null) {
+            return "No data";
+        }
+
+        if (is_string($data)) {
+            return $data;
+        }
+        $result = [];
+
+        foreach ($data as $key => $item) {
+            $item = (array) $item;
+
+            if (isset($item['_data'])) {
+                $result[] = $item['_data'];
+            } else if (count($item) == 0) {
+                //
+            } else {
+                return $data;
+            }
+        }
+        return $result;
     }
 }
