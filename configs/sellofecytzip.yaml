@@ -2,7 +2,7 @@ report:
   config:
     id: 01
     name: Sello FECYT 2025 ZIP CSV
-    description: Esta configuración expone los datos para la optención del sello fecyt en formato CSV en un zip
+    description: Esta configuración expone los datos para la obtención del sello fecyt en formato CSV en un zip
     authorization: admin
     format: csv
 
