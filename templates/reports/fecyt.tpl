@@ -42,10 +42,10 @@
 	{$data.about.en}
 
 	<b>Submissions:</b></br>
-	</br> QUEUED : {$data.STATUS_QUEUED.count}
-	</br> PUBLISHED : {$data.STATUS_PUBLISHED.count}
-	</br> DECLINED : {$data.STATUS_DECLINED.count}
-	</br> SCHEDULED : {$data.STATUS_SCHEDULED.count}
+	</br> QUEUED : {$data.STATUS_QUEUED.0.count}
+	</br> PUBLISHED : {$data.STATUS_PUBLISHED.0.count}
+	</br> DECLINED : {$data.STATUS_DECLINED.0.count}
+	</br> SCHEDULED : {$data.STATUS_SCHEDULED.0.count}
 
 	</br></br><b> Authors data </b>
 	<table>
@@ -116,10 +116,11 @@
 	{if $data.Export_URLs|@count > 0}
 		</br><b>URLs</b>
 		{call name="detailUrls" data=$data.Export_URLs}
+		</br>
 	{/if}
 
 	{if $data.Export_editorial_flow_of_the_selected_submission_reviews|@count > 0}
-		</br></br> <b>Journal identification</b> </br>
+		</br></br> <b>Editorial flow reviews</b> </br>
 
 		{$data.Export_editorial_flow_of_the_selected_submission_reviews}
 		</br>
