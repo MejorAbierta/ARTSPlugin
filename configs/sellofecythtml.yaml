@@ -2,7 +2,7 @@ report:
   config:
     id: 01
     name: Sello FECYT 2025 formato html
-    description: Esta configuración expone los datos para la optención del sello fecyt en Html
+    description: Esta configuración expone los datos para la obtención del sello fecyt en Html
     authorization: admin
     format: html #output format, can be html, csv, json and xml
     template: fecyt.tpl #output with html require a template, you should put your templates in templates/reports 
