@@ -57,7 +57,7 @@ class ArtsReportGenerator
                 }
             }
             if (count($fields) > 0) {
-                $filtered = $this->filterFileds($output, $fields);
+                $filtered = $this->filterFields($output, $fields);
             } else {
                 $filtered = $this->cleanArray($output);
             }
@@ -121,7 +121,7 @@ class ArtsReportGenerator
         }
     }
 
-    function filterFileds($data, $fields)
+    function filterFields($data, $fields)
     {
         if ($data == null) {
             return "No data";
