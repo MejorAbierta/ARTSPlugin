@@ -8,7 +8,7 @@
 		
 		{foreach from=$filesnames item=item key=key name=name}
 			
-			<li><a href="{$baseURL}{$item.filename}"> {$item.name}</a></li>
+			<li><a href="{$baseURL}{$item.filename}" target="_blank"> {$item.name}</a></li>
 			<p>{$item.description}
 			</p>
 		{/foreach}
