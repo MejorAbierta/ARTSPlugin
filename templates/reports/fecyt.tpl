@@ -57,7 +57,7 @@
 		{call name="detailUser" data=$data.Export_author_data}
 	</table>
 
-	{if $data.Export_reviewer_data|@count > 0}
+	{if $data.Export_reviewer_data|default:[]|@count > 0}
 		</br> <b> Reviewers data</b> </br>
 		<table>
 			<tr>
@@ -69,7 +69,7 @@
 		</table>
 	{/if}
 
-	{if $data.Export_issues_documentation|@count > 0}
+	{if $data.Export_issues_documentation|default:[]|@count > 0}
 		</br>
 		<b>Issues documentation</b></br>
 
@@ -85,14 +85,14 @@
 
 	{/if}
 
-	{if $data.Export_journal_identification_data|@count > 0}
+	{if $data.Export_journal_identification_data|default:[]|@count > 0}
 		</br></br> <b>Journal identification</b> </br>
 
 		{$data.Export_journal_identification_data.name.en}
 		</br>
 	{/if}
 
-	{if $data.Export_information_from_the_article_submission_page|@count > 0}
+	{if $data.Export_information_from_the_article_submission_page|default:[]|@count > 0}
 		</br>
 		<b>Author Guidelines</b> </br>
 		{$data.Export_information_from_the_article_submission_page['authorGuidelines']['en']}
@@ -103,7 +103,7 @@
 		</br>
 	{/if}
 
-	{if $data.Export_information_from_the_article_submission_page_2|@count > 0}
+	{if $data.Export_information_from_the_article_submission_page_2|default:[]|@count > 0}
 		</br>
 		<b>Title</b></br>
 		{$data.Export_information_from_the_article_submission_page_2['title']['en']}</br>
@@ -113,20 +113,20 @@
 
 	{/if}
 
-	{if $data.Export_URLs|@count > 0}
+	{if $data.Export_URLs|default:[]|@count > 0}
 		</br><b>URLs</b>
 		{call name="detailUrls" data=$data.Export_URLs}
 		</br>
 	{/if}
 
-	{if $data.Export_editorial_flow_of_the_selected_submission_reviews|@count > 0}
+	{if $data.Export_editorial_flow_of_the_selected_submission_reviews|default:[]|@count > 0}
 		</br></br> <b>Editorial flow reviews</b> </br>
 
 		{$data.Export_editorial_flow_of_the_selected_submission_reviews}
 		</br>
 	{/if}
 
-	{if $data.Export_editorial_flow_of_the_selected_submission_eventlogs|@count > 0}
+	{if $data.Export_editorial_flow_of_the_selected_submission_eventlogs|default:[]|@count > 0}
 		</br> <b> Editorial flow </b> </br>
 	<table>
 		<tr>
